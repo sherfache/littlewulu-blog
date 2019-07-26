@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>WSGI协议介绍与Django的wsgi实现介绍 - 帅番茄的编程札记</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="帅番茄" /><meta name="description" content="WSGI是啥 Web请求处理从大粒度上看不外乎三步: 接收请求 应用业务逻辑处理 返回响应 在Web服务开发过程中，其实我们最关注的不过是第二步，至于" /><meta name="keywords" content="帅番茄, 编程, 博客, 程序员" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.55.4 with even 4.0.0" />
+
+
+<link rel="canonical" href="https://littlewulu.cn/post/2019-07-26/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+<meta property="og:title" content="WSGI协议介绍与Django的wsgi实现介绍" />
+<meta property="og:description" content="WSGI是啥 Web请求处理从大粒度上看不外乎三步: 接收请求 应用业务逻辑处理 返回响应 在Web服务开发过程中，其实我们最关注的不过是第二步，至于" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://littlewulu.cn/post/2019-07-26/" />
+<meta property="article:published_time" content="2019-07-26T14:46:22&#43;08:00"/>
+<meta property="article:modified_time" content="2019-07-26T14:46:22&#43;08:00"/>
+
+<meta itemprop="name" content="WSGI协议介绍与Django的wsgi实现介绍">
+<meta itemprop="description" content="WSGI是啥 Web请求处理从大粒度上看不外乎三步: 接收请求 应用业务逻辑处理 返回响应 在Web服务开发过程中，其实我们最关注的不过是第二步，至于">
+
+
+<meta itemprop="datePublished" content="2019-07-26T14:46:22&#43;08:00" />
+<meta itemprop="dateModified" content="2019-07-26T14:46:22&#43;08:00" />
+<meta itemprop="wordCount" content="2109">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="WSGI协议介绍与Django的wsgi实现介绍"/>
+<meta name="twitter:description" content="WSGI是啥 Web请求处理从大粒度上看不外乎三步: 接收请求 应用业务逻辑处理 返回响应 在Web服务开发过程中，其实我们最关注的不过是第二步，至于"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">帅番茄</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">主页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/about">
+        <li class="mobile-menu-item">关于</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">帅番茄</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">主页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about">关于</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">WSGI协议介绍与Django的wsgi实现介绍</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2019-07-26 </span>
+        
+        
+      </div>
+    </header>
+
+    
+    <div class="post-content">
+      
+
+<h1 id="wsgi是啥"><strong>WSGI是啥</strong></h1>
+
+<p>Web请求处理从大粒度上看不外乎三步:</p>
+
+<ol>
+<li>接收请求</li>
+<li>应用业务逻辑处理</li>
+<li>返回响应</li>
+</ol>
+
+<p>在Web服务开发过程中，其实我们最关注的不过是第二步，至于TCP如何建立断开、如何从字节流中组装HTTP报文、如何解析HTTP头部、如何组装HTTP响应报文、如何把响应报文推向TCP连接等等，如果我们每次搭建web服务的时候都要考虑这些轮子问题，那将是苦不堪言，所幸，&rdquo;Do not repeat yourself&rdquo;，已有很多大牛为我们提供了很多轮子来完成这些事情；但是，轮子有了，要如何顺利地组装成跑车，这就需要有共识的协议或者标准，来指导这些轮子如何暴露出统一、规范的结合部【也就是接口】，让各位造出来的轮子能够拿来即用，&rdquo;一处生产，到处使用&rdquo;。</p>
+
+<p>WSGI (Web Server Gateway Interface) 是描述Python Web服务器和Python Web应用之间如何通信的一种规范、协议。它定义了一种server 与 application 解耦的规范，只要你的web application框架实现了wsgi中规定的接口，无论你的框架实现如何骚，都能立马与已有的多种符合wsgi规范的 web server服务器【如gunicorn、uwsgi】搭配跑起来；现在流行的依赖wsgi协议的web application 框架有如Django、Flask等等。</p>
+
+<p><img src="https://littlewulu.cn/source/images/1907/26_AV3JddkmfA9ibeywhDwDqOLTmKfXq3.png" alt="1" /></p>
+
+<h1 id="教练-我想写框架"><strong>教练，我想写框架</strong></h1>
+
+<p>从应用开发者来看，一个完整的web请求处理流程不外乎读request，写response；中间件在中间横插一脚，并且层层包裹，先对request指手画脚，一番蹂躏之后，才交给你最里层的业务逻辑处理函数(django叫view，也有叫handler)，处理完后返回response，又经过中间件们的指点江山，response才交给server发送给请求用户。</p>
+
+<p>在WSGI上下文中，每次Web Server接收到一个请求的时候，都会调用一次Web Application提供的可调用对象【这里的对象可以是一个函数、一个方法、类、或者是拥有 __call__ 内置方法的一个对象实例】</p>
+
+<p>WSGI协议要求这个可调用对象必须满足以下条件：</p>
+
+<ol>
+<li>接受两个参数
+
+<ol>
+<li>一个字典参数，字典中包含了处理request所需要的环境变量、请求变量等等</li>
+<li>一个回调函数，这个函数是server提供的一个回调函数，用于application向server发送HTTP响应码和HTTP响应头部</li>
+</ol></li>
+<li>返回一个可迭代(iterable)的对象，这个对象包装了response body。</li>
+</ol>
+
+<p>下面这个例子就是一个实现了WSGI协议的application</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">your_application</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+
+    <span class="c1"># 这里就是你的业务逻辑，也是application的request入口处和response出口处</span>
+    <span class="c1"># 实现框架无外乎在这里将请求信息打包传递给中间件链，最后达到handler/view，</span>
+    <span class="c1"># 然后再将response原路返回到这里，提交给server</span>
+    
+    <span class="n">response_body</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&#34;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&#34;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">environ</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+    <span class="p">]</span>
+    <span class="n">response_body</span> <span class="o">=</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">response_body</span><span class="p">)</span>
+
+    <span class="n">status</span> <span class="o">=</span> <span class="s2">&#34;200 OK&#34;</span>
+
+    <span class="n">response_headers</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&#34;Content-Type&#34;</span><span class="p">,</span> <span class="s2">&#34;text/plain&#34;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&#34;Content-Length&#34;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">response_body</span><span class="p">)))</span>
+    <span class="p">]</span>
+
+    <span class="c1"># 向server发送响应码和响应头部</span>
+    <span class="n">start_response</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">response_headers</span><span class="p">)</span>
+    
+    <span class="c1"># 向server返回可迭代的对象作为响应body</span>
+    <span class="c1"># 这里将如果直接返回 response_body，那么server将会迭代字符串，每次只向客户端发送一个字节</span>
+    <span class="c1"># 因此将response_body字符串包装成一个list可以获得更好的性能。</span>
+    <span class="c1"># 另，如果是Python3，则需要将str encode之后再返回给server，因为server可能不接受unicode字符串</span>
+    <span class="c1"># 因此必须将str 编码为 byte序列</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">response_body</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)]</span></code></pre></td></tr></table>
+</div>
+</div>
+<p>接下来我们用Python官方库自带的简单wsgi-server来测试一下我们的应用</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">import wsgiref.simple_server import make_server
+
+def your_application(environ, start_response):
+    # 实现见上个片段
+    pass
+
+server = make_server(
+    &#34;localhost&#34;,
+    9999,
+    your_application
+)
+
+server.handle_request()</pre></td></tr></table>
+</div>
+</div>
+<p>运行该文件，然后 <code>curl http://localhost:9999/</code>，读者可以自行运行看看结果</p>
+
+<h1 id="窥视一下django的wsgi实现">窥视一下Django的wsgi实现</h1>
+
+<p>按照django的new project 命令，可以在project/ 目录下看到wsgi.py文件，看该文件的内容如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">import os
+
+from django.core.wsgi import get_wsgi_application
+
+os.environ.setdefault(&#34;DJANGO_SETTINGS_MODULE&#34;, &#34;project.settings&#34;)
+
+application = get_wsgi_application()</pre></td></tr></table>
+</div>
+</div>
+<p>可以看到django通过get_wsgi_application函数生成一个application实例，在看看该函数做了些啥</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">import django
+from django.core.handlers.wsgi import WSGIHandler
+
+def get_wsgi_application():
+    django.setup(set_prefix=False)
+    return WSGIHandler()</pre></td></tr></table>
+</div>
+</div>
+<p>该函数返回了一个WSGIHandler实例，我们在看看该对象实例长什么样</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">WSGIHandler</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">BaseHandler</span><span class="p">):</span>
+    <span class="n">request_class</span> <span class="o">=</span> <span class="n">WSGIRequest</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+        <span class="c1"># 实例化的时候，load_middleware方法将settings中的中间件配置加载进来，以便之后处理请求 </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_middleware</span><span class="p">()</span>
+
+    <span class="c1"># 实现实例的__call()__方法，让WSGIHandler实例成为一个可调用对象</span>
+    <span class="c1"># 可以看到，该方法的签名满足WSGI要求的接口规范</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+        <span class="n">set_script_prefix</span><span class="p">(</span><span class="n">get_script_name</span><span class="p">(</span><span class="n">environ</span><span class="p">))</span>
+        <span class="n">signals</span><span class="o">.</span><span class="n">request_started</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">sender</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">environ</span><span class="o">=</span><span class="n">environ</span><span class="p">)</span>
+        
+        <span class="c1"># self.request_class()方法从environ字典中获取环境变量、请求变量、请求body等数据构造request对象</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_class</span><span class="p">(</span><span class="n">environ</span><span class="p">)</span>
+        
+        <span class="c1"># self.get_response()方法将request传递给中间件链，业务逻辑主要在这里实现</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="o">...</span>
+        
+        <span class="c1"># 调用回调函数，推送http状态码 和 响应头部给server</span>
+        <span class="n">start_response</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">response_headers</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;file_to_stream&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;wsgi.file_wrapper&#39;</span><span class="p">):</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">environ</span><span class="p">[</span><span class="s1">&#39;wsgi.file_wrapper&#39;</span><span class="p">](</span><span class="n">response</span><span class="o">.</span><span class="n">file_to_stream</span><span class="p">)</span>
+        
+        <span class="c1"># 返回可迭代的响应body对象</span>
+        <span class="k">return</span> <span class="n">response</span></code></pre></td></tr></table>
+</div>
+</div>
+<ul>
+<li>参考
+
+<ul>
+<li><a href="https://wsgi.readthedocs.io/en/latest/learn.html">https://wsgi.readthedocs.io/en/latest/learn.html</a>  - wsgi 介绍</li>
+<li><a href="https://www.cnblogs.com/laozhbook/p/python_pep_333.html">https://www.cnblogs.com/laozhbook/p/python_pep_333.html</a>  - PEP333 翻译</li>
+</ul></li>
+</ul>
+
+    </div>
+
+    
+<footer class="post-footer">
+      
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/2019-07-24/">
+            <span class="next-text nav-default">Python GIL 全局解释性锁介绍</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+</div>
+
+<div class="copyright">
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019
+    <span class="heart">
+      @
+    </span>
+    <span class="author">littlewulu 版权所有 粤ICP备18143782号-1</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Python GIL 全局解释性锁介绍 - 帅番茄的编程札记</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="帅番茄" /><meta name="description" content="什么是GIL GIL (Global Interpreter Lock)，全局解释性锁，它上锁的对象是解释器，而Python代码的运行需要解释器进行解释成字节码并提供虚拟机运行，这么大" /><meta name="keywords" content="帅番茄, 编程, 博客, 程序员" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.55.4 with even 4.0.0" />
+
+
+<link rel="canonical" href="https://littlewulu.cn/post/2019-07-24/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+<meta property="og:title" content="Python GIL 全局解释性锁介绍" />
+<meta property="og:description" content="什么是GIL GIL (Global Interpreter Lock)，全局解释性锁，它上锁的对象是解释器，而Python代码的运行需要解释器进行解释成字节码并提供虚拟机运行，这么大" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://littlewulu.cn/post/2019-07-24/" />
+<meta property="article:published_time" content="2019-07-24T15:53:37&#43;08:00"/>
+<meta property="article:modified_time" content="2019-07-24T15:53:37&#43;08:00"/>
+
+<meta itemprop="name" content="Python GIL 全局解释性锁介绍">
+<meta itemprop="description" content="什么是GIL GIL (Global Interpreter Lock)，全局解释性锁，它上锁的对象是解释器，而Python代码的运行需要解释器进行解释成字节码并提供虚拟机运行，这么大">
+
+
+<meta itemprop="datePublished" content="2019-07-24T15:53:37&#43;08:00" />
+<meta itemprop="dateModified" content="2019-07-24T15:53:37&#43;08:00" />
+<meta itemprop="wordCount" content="1464">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Python GIL 全局解释性锁介绍"/>
+<meta name="twitter:description" content="什么是GIL GIL (Global Interpreter Lock)，全局解释性锁，它上锁的对象是解释器，而Python代码的运行需要解释器进行解释成字节码并提供虚拟机运行，这么大"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">帅番茄</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">主页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/about">
+        <li class="mobile-menu-item">关于</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">帅番茄</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">主页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about">关于</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Python GIL 全局解释性锁介绍</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2019-07-24 </span>
+        
+        
+      </div>
+    </header>
+
+    
+    <div class="post-content">
+      
+
+<h1 id="什么是gil">什么是GIL</h1>
+
+<p>GIL (Global Interpreter Lock)，全局解释性锁，它上锁的对象是解释器，而Python代码的运行需要解释器进行解释成字节码并提供虚拟机运行，这么大粒度的锁意味着，一个Python进程内的线程只有先获得GIL，才能得到代码执行的机会，这个锁使得Python进程的多线程无法利用多核cpu带来性能提升。</p>
+
+<p>但需要明确的一点是，GIL并不是Python的特性，而是CPython（最常用的Python解释器）的特性。这意味着我们可以使用其他的Python解释器从而绕过GIL的困扰，如JPython就没有GIL。但由于CPython是大部分环境下默认的Python解释器，而且Python社区大部分第三方库也依赖GIL这个特性提供的线程安全，由于这样的历史路径依赖，我们对GIL是欲罢不能。</p>
+
+<h1 id="看见gil">看见GIL</h1>
+
+<p>接下来我们通过几个简单的例子来看看GIL对多核利用的影响</p>
+
+<p>运行如下代码看看CPU的占用率</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">def dead_loop():
+    while True:
+        pass
+
+if __name__ == &#34;__main__&#34;:
+    dead_loop()    </pre></td></tr></table>
+</div>
+</div>
+<p><img src="https://littlewulu.cn/source/images/1907/24_yXRskKF4lwERKM4kCdmJTDjRbLOtSQ.jpg" alt="1" /></p>
+
+<p>测试的机器是个人 macbook pro，4个物理CPU，划分为8个逻辑CPU；可以看到该程序的确是把单核的占用跑满了；接着我们多开一个线程一起跑dead_loop，线程是CPU调度的基本单位，按道理两个线程应该并行运行，CPU占用应该提高一倍；</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">import threading
+
+def dead_loop():
+    while True:
+        pass
+
+if __name__ == &#34;__main__&#34;:
+    t = threading.Thread(target=dead_loop)
+    t.start()
+
+    dead_loop()
+
+    t.join()</pre></td></tr></table>
+</div>
+</div>
+<p><img src="https://littlewulu.cn/source/images/1907/24_flFGbt9jQj0NmeOR7mAjzc6hO50kDj.jpg" alt="2" /></p>
+
+<p>如图，确实是运行了两个线程，但是只有一个线程是激活的，只跑满一个核，CPU的占用率依旧是 <sup>1</sup>&frasl;<sub>8</sub> 左右 【因为有其他用户程序，因此略高于 <sup>1</sup>&frasl;<sub>8</sub> 】。</p>
+
+<p>作为对比，我们使用Golang跑两个线程看看。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kd">func</span> <span class="nf">main</span><span class="p">(){</span>
+	<span class="nx">ch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">int</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+	<span class="nx">k</span> <span class="o">:=</span> <span class="mi">1</span>
+	<span class="k">for</span> <span class="nx">i</span><span class="o">:=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="p">&lt;</span><span class="mi">2</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">{</span>
+		<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+			<span class="k">for</span> <span class="p">;</span> <span class="nx">k</span><span class="p">&gt;</span><span class="mi">0</span> <span class="p">;</span> <span class="p">{</span>
+
+			<span class="p">}</span>
+		<span class="p">}()</span>
+	<span class="p">}</span>
+
+	<span class="o">&lt;-</span> <span class="nx">ch</span>
+<span class="p">}</span></pre></td></tr></table>
+</div>
+</div>
+<p><img src="https://littlewulu.cn/source/images/1907/24_SrG5ukBDbgu5ImbYNLN0lqMGDitS7r.jpg" alt="3" /></p>
+
+<p>可以看到，Golang的确按照预期的那样，两个线程在死循环运行，CPU占用率达到总的 <sup>1</sup>&frasl;<sub>4</sub> 左右。</p>
+
+<p>从以上的示例我们可以发现，GIL确实限制了Python进程的多线程对多核CPU的利用。</p>
+
+<h1 id="怎么办">怎么办</h1>
+
+<ol>
+<li><p><strong>使用其他解释器</strong></p>
+
+<p>GIL只是CPython的产物，像JPython和IronPython这样的解释器由于实现语言的特性，它们不需要GIL的帮助，但是由于用来Java/C#用于解释器的实现，它们也失去了利用社区众多C语言模块有用特性的机会。【Done is better than perfect】</p></li>
+
+<li><p><strong>用multiprocessing替代Thread</strong></p>
+
+<p>multiprocessing库的出现很大程度上是为了弥补thread库因为GIL而低效的缺陷，它使用了多进程而不是多线程，而每个进程有自己独立的GIL，因此不会出现进程间的GIL争抢。</p>
+
+<p>但是multiprocessing也有其他麻烦，比如本来的多线程的同步和通信机制在多进程下就用不了了，拿计数器来举例子，如果要多个线程同时累加一个变量，对于thread来说，声明一个global变量，加个访问锁即可搞定；但是由于进程有自己独立的地址空间，无法直接访问彼此的变量数据，因此这个共享数据就必须从进程里提出到更高层的存储中，苦呀。</p>
+
+<p>看看多进程的CPU占用</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">import multiprocessing
+    
+def dead_loop():
+    while True:
+        pass
+    
+if __name__ == &#34;__main__&#34;:
+    p = multiprocessing.Process(target=dead_loop)
+    p.start()
+    
+    dead_loop()
+    
+    p.join()</pre></td></tr></table>
+</div>
+</div>
+<p><img src="https://littlewulu.cn/source/images/1907/25_VaCve398LM5n1G9cv5lt15otcCog2R.jpg" alt="4" /></p>
+
+<p>开了两个进程，俱跑满了单核</p></li>
+
+<li><p><strong>社区的努力</strong></p>
+
+<p>Python社区也一直在努力地改进GIL，甚至尝试去除GIL</p>
+
+<ul>
+<li>将切换粒度从基于opcode计数改成基于时间片计数</li>
+<li>避免最近一次释放GIL锁的线程再次被立即调度</li>
+<li>新增线程优先级功能（高优先级可以迫使其他线程释放所持有的GIL锁）
+<br /></li>
+</ul></li>
+</ol>
+
+<h1 id="总结">总结</h1>
+
+<p>Python GIL是功能与性能之间权衡后的产物，虽然它的存在导致Python单进程的CPU密集型多线程形同虚设，但它有其存在的合理性【简单有用地实现线程安全】，也有其较难改变的客观因素【历史路径依赖】。</p>
+
+<ul>
+<li>参考
+
+<ul>
+<li><a href="http://cenalulu.github.io/python/gil-in-python/">http://cenalulu.github.io/python/gil-in-python/</a></li>
+<li><a href="http://zhuoqiang.me/python-thread-gil-and-ctypes.html">http://zhuoqiang.me/python-thread-gil-and-ctypes.html</a></li>
+<li><a href="https://www.jianshu.com/p/c70474e1db0a">https://www.jianshu.com/p/c70474e1db0a</a></li>
+</ul></li>
+</ul>
+
+    </div>
+
+    
+<footer class="post-footer">
+      
+      <nav class="post-nav">
+        <a class="prev" href="/post/2019-07-26/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">WSGI协议介绍与Django的wsgi实现介绍</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/2019-07-23/">
+            <span class="next-text nav-default">TCP 报文结构介绍</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+</div>
+
+<div class="copyright">
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019
+    <span class="heart">
+      @
+    </span>
+    <span class="author">littlewulu 版权所有 粤ICP备18143782号-1</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
