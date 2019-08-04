@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>雪花算法介绍与实现 - 帅番茄的编程札记</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="帅番茄" /><meta name="description" content="什么是雪花算法 在分布式场景中，一个常见的场景是需要生成全局唯一的ID，雪花算法(Snowflake)是属于划分命名空间并行生成ID的一种算法" /><meta name="keywords" content="帅番茄, 编程, 博客, 程序员" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.55.4 with even 4.0.0" />
+
+
+<link rel="canonical" href="https://littlewulu.cn/post/2019-08-04/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+<meta property="og:title" content="雪花算法介绍与实现" />
+<meta property="og:description" content="什么是雪花算法 在分布式场景中，一个常见的场景是需要生成全局唯一的ID，雪花算法(Snowflake)是属于划分命名空间并行生成ID的一种算法" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://littlewulu.cn/post/2019-08-04/" />
+<meta property="article:published_time" content="2019-08-04T09:01:59&#43;08:00"/>
+<meta property="article:modified_time" content="2019-08-04T09:01:59&#43;08:00"/>
+
+<meta itemprop="name" content="雪花算法介绍与实现">
+<meta itemprop="description" content="什么是雪花算法 在分布式场景中，一个常见的场景是需要生成全局唯一的ID，雪花算法(Snowflake)是属于划分命名空间并行生成ID的一种算法">
+
+
+<meta itemprop="datePublished" content="2019-08-04T09:01:59&#43;08:00" />
+<meta itemprop="dateModified" content="2019-08-04T09:01:59&#43;08:00" />
+<meta itemprop="wordCount" content="1314">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="雪花算法介绍与实现"/>
+<meta name="twitter:description" content="什么是雪花算法 在分布式场景中，一个常见的场景是需要生成全局唯一的ID，雪花算法(Snowflake)是属于划分命名空间并行生成ID的一种算法"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">帅番茄</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">主页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/about">
+        <li class="mobile-menu-item">关于</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">帅番茄</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">主页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about">关于</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">雪花算法介绍与实现</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2019-08-04 </span>
+        
+        
+      </div>
+    </header>
+
+    
+    <div class="post-content">
+      
+
+<h1 id="什么是雪花算法">什么是雪花算法</h1>
+
+<p>在分布式场景中，一个常见的场景是需要生成全局唯一的ID，雪花算法(Snowflake)是属于划分命名空间并行生成ID的一种算法。如下图：</p>
+
+<p><img src="https://littlewulu.cn/source/images/1908/04_QWEkKpfdpsmaVxOHWHcAaOiSgdqOvM.png" alt="1" /></p>
+
+<p>在一个64-bit长度的长整型中，通用的雪花算法将其划分为四个部分：</p>
+
+<ul>
+<li>1-bit保留位</li>
+<li>41-bit作为时间戳，该时间戳并不需要从1970年1月1号算起，完全可以从你的项目部署的时间点a算起，以当前的时间戳b计算偏移量(b-a)，作为该时间戳段的值，单位可以是毫秒或者秒，视实际并发量决定，以毫秒为例，41bit的时间戳长度可以覆盖69年；</li>
+<li>10-bit作为机器ID，分布式架构中一个应用可能部署多个实例，或者多个应用需要同时生成同一个含义的全局唯一性ID，10bit的长度能够支持1024个机器；当然这10bit可以进一步拆分，比如拆分成5bit作为服务器的ID，剩下5bit作为进程ID；</li>
+<li>12-bit作为序列号，即在时间戳单位内（秒或者毫秒），可以覆盖的序列号，12bit的长度能够覆盖4096个序列号；</li>
+</ul>
+
+<p>当然，这只是通用的划分，你完全可以根据需要改变各个空间的长度划分，比如你的机器并没有那么多，那么你可以将机器ID的空间缩短到6bit，并将序列号空间的长度增加到16位，视具体场景而定。</p>
+
+<ul>
+<li>雪花算法的流程大概是这样的：</li>
+<li>初始化时间戳偏移量【可以是你第一次部署应用的时间点】；初始化机器ID，可以从中控中心（服务中心）获取，或者直接读配置文件，有一些做法是将机器所在的IP地址相加(255+255+255+255 &lt; 1024)作为机器ID，你也可以有其他做法，但是要保证不同实例的机器ID不能出现碰撞，否则将导致大量的重复ID；</li>
+<li>在需要生成全局唯一ID的时候，判断当前时间戳是否与上一次调用的时间戳一致，如果一致，则递增序列号，返回生成的ID；如果不一致，则序列号重置为0【也有一些随机重置为0到9之间，为的是让数据库分库分表的时候足够均匀，因为如果一直重置为0，将会导致大量序列号为0的ID出现】，返回生成的ID。</li>
+</ul>
+
+<h1 id="go-版的实现">Go 版的实现</h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">import (
+	&#34;sync&#34;
+	&#34;time&#34;
+)
+
+// 基本配置
+var (
+	// 偏移时间 2018-01-01 00:00:00 的时间戳-秒
+	epoch int64 = 1514764800
+
+	// 时间戳占位
+	timeBits uint8 = 41
+	// worker占位
+	workerBits uint8 = 4
+	// 序列器占位
+	sequenceBits uint8 = 18
+
+	// shift
+	timeShift uint8 = workerBits + sequenceBits
+	workerShift uint8 = sequenceBits
+
+	// max
+	sequenceMax uint32 = 1 &lt;&lt; sequenceBits
+
+)
+
+var SnowFlakeInstance *SnowFlake
+
+func init(){
+	SnowFlakeInstance = &amp;SnowFlake{
+		Epoch:epoch,
+		TimeBits:timeBits,
+		WorkerBits:workerBits,
+		SequenceBits:sequenceBits,
+		TimeShift:timeShift,
+		WorkerShift:workerShift,
+		CurrentWorkerID: 1,  // 机器id, 可从配置文件读取
+		CurrentSequence:0,
+		CurrentTimeStamp:time.Now().Unix() - epoch,
+	}
+}
+
+type SnowFlake struct {
+	// 实例锁
+	mt sync.RWMutex
+
+	Epoch int64  // 偏移时间
+	TimeBits uint8
+	WorkerBits uint8
+	SequenceBits uint8
+
+	TimeShift uint8
+	WorkerShift uint8
+	
+	// 当前时间戳
+	CurrentTimeStamp int64
+	// 当前worker号
+	CurrentWorkerID uint32
+	// 当前序列器
+	CurrentSequence uint32
+}
+
+// 生成ID
+func (sf *SnowFlake)GenerateID()int64{
+	sf.mt.Lock()
+	defer sf.mt.Unlock()
+
+	// 序列器超了
+	if sf.CurrentSequence &gt;= sequenceMax {
+		time.Sleep(1 * time.Second)
+	}
+
+	ctt := sf.getTimeStamp()
+	var id int64
+
+	// 如何在同一秒内 自增序列器
+	if sf.CurrentTimeStamp == ctt {
+		sf.CurrentSequence++
+		id = sf.generateID()
+	}else{
+		// 更新&amp;复位
+		sf.CurrentTimeStamp = ctt
+		sf.CurrentSequence = 0
+		id = sf.generateID()
+	}
+	return id
+}
+
+func (sf *SnowFlake)generateID()int64{
+	var id int64 = 0
+	// 时间戳
+	id = id | (sf.CurrentTimeStamp &lt;&lt; sf.TimeShift)
+	// worker_id
+	id = id | int64(sf.CurrentWorkerID &lt;&lt; sf.WorkerShift)
+	// 序列器
+	id = id | int64(sf.CurrentSequence)
+	return id
+}
+
+// 获取时间 - 秒级别
+func (sf *SnowFlake)getTimeStamp()int64{
+	return time.Now().Unix() - sf.Epoch
+}</pre></td></tr></table>
+</div>
+</div>
+<h1 id="测试用例">测试用例</h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">func TestSnowFlake_GenerateID(t *testing.T) {
+	var wt sync.WaitGroup
+	for i:=0; i&lt;5; i++{
+		wt.Add(1)
+		go func(num int) {
+			for j:=0; j&lt;1000; j++{
+				id := SnowFlakeInstance.GenerateID()
+				fmt.Println(&#34;go-&#34;, num, id)
+				//time.Sleep(10 * time.Millisecond)
+			}
+			wt.Done()
+		}(i)
+	}
+	wt.Wait()
+}</pre></td></tr></table>
+</div>
+</div>
+<ul>
+<li>完整的实例代码地址：<a href="https://github.com/littlewulu/demo/tree/master/snowflake">看完整代码</a></li>
+</ul>
+
+    </div>
+
+    
+<footer class="post-footer">
+      
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/2019-07-26/">
+            <span class="next-text nav-default">WSGI协议介绍与Django的wsgi实现介绍</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+</div>
+
+<div class="copyright">
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019
+    <span class="heart">
+      @
+    </span>
+    <span class="author">littlewulu 版权所有 粤ICP备18143782号-1</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

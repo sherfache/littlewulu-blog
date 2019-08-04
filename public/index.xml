@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>littlewulu 版权所有 粤ICP备18143782号-1</copyright>
-    <lastBuildDate>Fri, 26 Jul 2019 14:46:22 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 04 Aug 2019 09:01:59 +0800</lastBuildDate>
     
 	<atom:link href="https://littlewulu.cn/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>雪花算法介绍与实现</title>
+      <link>https://littlewulu.cn/post/2019-08-04/</link>
+      <pubDate>Sun, 04 Aug 2019 09:01:59 +0800</pubDate>
+      
+      <guid>https://littlewulu.cn/post/2019-08-04/</guid>
+      <description>什么是雪花算法 在分布式场景中，一个常见的场景是需要生成全局唯一的ID，雪花算法(Snowflake)是属于划分命名空间并行生成ID的一种算法</description>
+    </item>
     
     <item>
       <title>WSGI协议介绍与Django的wsgi实现介绍</title>
