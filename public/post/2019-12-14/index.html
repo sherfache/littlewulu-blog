@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>RabbitMQ【一】 AMQP协议 - 帅番茄的编程札记</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="帅番茄" /><meta name="description" content="为什么要用消息队列 总所周知，消息队列最显眼的好处即使&amp;rdquo;削峰填谷&amp;rdquo; —— 管你外部万马奔腾，来到我这里就得一个一个排着来 进" /><meta name="keywords" content="帅番茄, 编程, 博客, 程序员" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.55.4 with even 4.0.0" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/2019-12-14/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+<meta property="og:title" content="RabbitMQ【一】 AMQP协议" />
+<meta property="og:description" content="为什么要用消息队列 总所周知，消息队列最显眼的好处即使&rdquo;削峰填谷&rdquo; —— 管你外部万马奔腾，来到我这里就得一个一个排着来 进" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/2019-12-14/" />
+<meta property="article:published_time" content="2019-12-14T00:00:00&#43;08:00"/>
+<meta property="article:modified_time" content="2019-12-14T00:00:00&#43;08:00"/>
+
+<meta itemprop="name" content="RabbitMQ【一】 AMQP协议">
+<meta itemprop="description" content="为什么要用消息队列 总所周知，消息队列最显眼的好处即使&rdquo;削峰填谷&rdquo; —— 管你外部万马奔腾，来到我这里就得一个一个排着来 进">
+
+
+<meta itemprop="datePublished" content="2019-12-14T00:00:00&#43;08:00" />
+<meta itemprop="dateModified" content="2019-12-14T00:00:00&#43;08:00" />
+<meta itemprop="wordCount" content="2311">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="RabbitMQ【一】 AMQP协议"/>
+<meta name="twitter:description" content="为什么要用消息队列 总所周知，消息队列最显眼的好处即使&rdquo;削峰填谷&rdquo; —— 管你外部万马奔腾，来到我这里就得一个一个排着来 进"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">帅番茄</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">主页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/about">
+        <li class="mobile-menu-item">关于</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">帅番茄</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">主页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about">关于</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">RabbitMQ【一】 AMQP协议</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2019-12-14 </span>
+        
+        
+      </div>
+    </header>
+
+    
+    <div class="post-content">
+      
+
+<h1 id="为什么要用消息队列">为什么要用消息队列</h1>
+
+<ul>
+<li>总所周知，消息队列最显眼的好处即使&rdquo;削峰填谷&rdquo; —— 管你外部万马奔腾，来到我这里就得一个一个排着来</li>
+<li>进一步讲，消息通信机制的本质就是在消息发送方和消息接收方之间添加了 <strong>存储转发(Store and Forward)</strong> 功能，通过存储转发功能，消息发送方和消息接收方之间并不需要知晓对方的存在，也不需要同时在线，更不会限制必须使用同样的技术实现，也就是解耦 —— 紧耦合的单阶段远程方法调用通过消息队列转变为松耦合的两阶段过程</li>
+</ul>
+
+<h1 id="什么是rabbitmq-amqp">什么是RabbitMQ、AMQP</h1>
+
+<ul>
+<li>RabbitMQ一款使用<code>Erlang</code>语言实现的、基于高级消息队列模型的开源消息队列软件</li>
+<li>AMQP(Advanced Message Queuing Protocol 高级消息队列协议) 不仅定义了一种网络协议，同时也定义了服务器端的服务和行为
+
+<ul>
+<li>这些信息就是高级消息队列(Advanced Message Queuing) 模型</li>
+<li>AMQ模型在逻辑上定义了三种抽象组件用于指定消息的路由行为
+
+<ul>
+<li><code>交换器(Exchange)</code>: 消息代理服务器中用于把消息路由到队列的组件</li>
+<li><code>队列(Queue)</code>: 用来存储消息的数据结构</li>
+<li><code>绑定(banding)</code>: 一套规则，用于告诉交换器，消息应该被存储到哪个队列</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<p><img src="https://littlewulu.cn/source/images/1912/11_uoeMmpqy8fhajE4926Bb7KbwI5ZBaq.png" alt="1.png" /></p>
+
+<ul>
+<li>AMQ模型使用绑定(banding)来定义队列与交换器之间的关系，在RabbitMQ中，绑定或 <code>绑定键(banding-key)</code> 告知一个交换器应该将消息投递到哪个队列
+
+<ul>
+<li>当发布一条消息到交换器时，应用程序使用 <code>路由键(routing-key)</code> 属性来决定该消息的归属，当交换器对一条消息进行评估以决定路由到哪些合适的队列时，消息的路由键就会和绑定键进行比对，你可以理解为 —— <code>绑定键是交换器与队列的匹配规则，而路由键则是这些规则的评估对象</code></li>
+</ul></li>
+</ul>
+
+<h1 id="使用amq协议与rabbitmq进行交互">使用AMQ协议与RabbitMQ进行交互</h1>
+
+<ul>
+<li>RabbitMQ(作为一种AMQP代理服务器)采用了RPC(远程过程调用)的模式进行通信，与大多数web api不同的是，除了客户端会向服务器发送命令，在AMQP规范中，服务器也可以向客户端发送命令 —— 这对于客户端来说，意味着它应该监听来自服务器的通信
+
+<ul>
+<li><img src="https://littlewulu.cn/source/images/1912/14_8MdwDYmCQjcVA6EyoYoTUVtq3DpbQd.png" alt="2.png" /></li>
+<li>一个完整<code>连接(connection)</code>需要由三个同步RPC请求所组成的序列完成</li>
+</ul></li>
+<li>一个AMQP连接(connection)可以有多个<code>信道(channel)</code>，允许客户端与服务器之间进行多次会话 —— 从技术上，这称为<code>多路复用</code>
+
+<ul>
+<li>在编组帧的线路上，信道不过是分配给服务器和客户端之间所传递消息的一个整数值
+
+<ul>
+<li>而在RabbitMQ服务器和客户端中，它们代表更多的含义 —— 因为会为每个信道设置内存结构和对象，连接中的信道越多，RabbitMQ用于管理该连接的消息流所需要的内存也就越多</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h2 id="amqp-rpc帧结构">AMQP RPC帧结构</h2>
+
+<ul>
+<li>AMQP中使用类和方法在客户端和服务器端创建公共语言 —— 这些类和方法被称为AMQP命令(AMQP commands)
+
+<ul>
+<li>AMQP中的类定义了一个功能范围，每个类都包含执行不同任务的方法
+
+<ul>
+<li>举个栗子，在连接协商的过程中，RabbitMQ服务器发送一个 <code>Connection.Start</code> 命令，然后编组成一个帧并发给客户端</li>
+<li><img src="https://littlewulu.cn/source/images/1912/14_A5mzSwxmptKz2VjB7OOqB2JzibAsZQ.png" alt="3.png" /></li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h3 id="amqp帧组件">AMQP帧组件</h3>
+
+<ul>
+<li>低层AMQP帧由五个不同的组件组成
+
+<ul>
+<li>1 <code>帧类型</code> 【一个字节】</li>
+<li>2 <code>信道编号</code></li>
+<li>3 <code>以字节为单位的帧大小</code>【size】</li>
+<li>4 <code>帧有效载荷</code></li>
+<li>5 <code>结束字节标记</code> 【<code>ASCII值 0xce</code>】
+
+<ul>
+<li><img src="https://littlewulu.cn/source/images/1912/14_BmdLoIiRzPyScXYoPCtX5A9MjkNUzi.png" alt="4.png" /></li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h3 id="帧类型">帧类型</h3>
+
+<ul>
+<li>1 <strong>协议头帧</strong>
+
+<ul>
+<li>用于连接到RabbitMQ，每个连接仅使用一次</li>
+</ul></li>
+<li>2 <strong>方法帧</strong>
+
+<ul>
+<li>携带发送给RabbitMQ或者由RabbitMQ发出的RPC请求或响应</li>
+</ul></li>
+<li>3 <strong>内容头帧</strong>
+
+<ul>
+<li>包含一条消息的大小和属性，也可以叫<strong>消息头帧</strong></li>
+</ul></li>
+<li>4 <strong>消息体帧</strong>
+
+<ul>
+<li>包含消息的内容</li>
+</ul></li>
+<li>5 <strong>心跳帧</strong>
+
+<ul>
+<li>在客户端与RabbitMQ之间进行传递，作为一种校验机制确保连接的两端都可用且在正常工作</li>
+<li>心跳帧如果没有得到响应则RabbitMQ会断开连接，心跳间隔默认值是600s</li>
+</ul></li>
+<li>在使用客户端库时，协议头帧和心跳帧对于开发者而言通常是透明的</li>
+</ul>
+
+<h2 id="将消息编组成帧">将消息编组成帧</h2>
+
+<ul>
+<li>连接建立后，发布消息的时候，大致会发生如下的流程
+
+<ul>
+<li>1 发送的第一个帧是携带命令和执行它所需参数【如交换器和路由键】的方法帧</li>
+<li>2 方法帧之后是消息头帧，消息头中包含消息属性和消息体大小</li>
+<li>3 帧大小有上限，如果消息体超过这个上限【默认大小是131KB】，内容消息将被拆分成多个消息体帧</li>
+<li>—— 这些帧始终以相同的顺序发送：方法帧、消息头帧以及一个或者多个消息体帧</li>
+<li>如下图
+
+<ul>
+<li><img src="https://littlewulu.cn/source/images/1912/14_iAQ4vmNgNtBYZL3Y5kVdNzvr6qQZgc.jpg" alt="5.png" /></li>
+</ul></li>
+<li>为了高效地处理并最小化传输数据，方法帧和消息头帧的内容是人类不可读的二进制打包数据，而消息体帧内携带的消息内容没有进行任何打包或者编码，可以包含从纯文本到二进制图像数据等任何内容</li>
+</ul></li>
+</ul>
+
+<h3 id="来几个栗子">来几个栗子</h3>
+
+<ul>
+<li>方法帧结构
+
+<ul>
+<li><img src="https://littlewulu.cn/source/images/1912/14_jVFUsvju4gTI741vI0JH0oSPUHABEo.jpg" alt="6.png" /></li>
+</ul></li>
+<li>消息头帧
+
+<ul>
+<li><img src="https://littlewulu.cn/source/images/1912/14_Cip3RMgX6UN69cu44DiEKBzkDeO2oG.jpg" alt="7.png" /></li>
+</ul></li>
+<li>消息体帧
+
+<ul>
+<li><img src="https://littlewulu.cn/source/images/1912/14_8b8ga3Hf2jM0CqNaAYyvwZDRYZ5nLC.jpg" alt="8.png" /></li>
+</ul></li>
+</ul>
+
+<h1 id="使用协议">使用协议</h1>
+
+<ul>
+<li>声明交换器
+
+<ul>
+<li>交换器在AMQP规范中有自己的类，可以使用<code>Exchange.Declare</code>命令创建交换器</li>
+<li><img src="https://littlewulu.cn/source/images/1912/14_Ktbn04eM9LXFuIl2GXLNI2k6RpZB40.jpg" alt="9.jpg" /></li>
+</ul></li>
+<li>声明队列
+
+<ul>
+<li><code>Queue.Declare</code>是幂等性的，RabbitMQ不会处理后续的队列声明，只会返回队列相关的有用信息，如队列中待处理消息的数量以及订阅该队列的消费者数量等
+
+<ul>
+<li><code>但需要注意的是，当你尝试声明一个与现有队列同名的新队列时，如果新队列的属性与现有队列不一样，那么RabbitMQ将关闭这个发出RPC请求的信道【即形如拒绝该请求】，这时候你的客户端可能需要监听并handle这样的错误，否则你可能在消费消息的时候不知道RabbitMQ已经停止向你的客户端发送消息，而你仍旧以为它正常运行并订阅了一个空队列</code></li>
+</ul></li>
+<li><img src="https://littlewulu.cn/source/images/1912/14_9S5ECoNk4L8aTTw8tAruP7A2YwBjAI.jpg" alt="10.jpg" /></li>
+</ul></li>
+<li>绑定队列到交换器
+
+<ul>
+<li><img src="https://littlewulu.cn/source/images/1912/14_Y9HeQ3XpMukE7qWd0UYf5nJ89r388v.jpg" alt="11.jpg" /></li>
+</ul></li>
+<li>发布消息到RabbitMQ
+
+<ul>
+<li><img src="https://littlewulu.cn/source/images/1912/14_JfROMvyDJuQshAOTnk2G5vxLsnNCYw.jpg" alt="12.jpg" /></li>
+<li>方法帧中携带了消息的交换器名称和路由键</li>
+</ul></li>
+<li>从RabbitMQ中消费消息
+
+<ul>
+<li><img src="https://littlewulu.cn/source/images/1912/14_EGPdHYUiX8ypCMGdWrNh1AkDkCn6oa.jpg" alt="13.jpg" /></li>
+<li>一旦发送完<code>Basic.Consume</code>命令，消费者将处于活跃状态，如果消费者想要停止接收消息，则可以发出一个 <code>Basic.Cancel</code>命令</li>
+<li>当发送<code>Basic.Ack</code>响应帧时，消费者必须适用<code>Basic.Deliver</code>方法帧中传递的一个名为投递标签(deliver tag)的参数 —— RabbitMQ适用投递标签和信道作为唯一标识符来实现消息确认、拒绝和否定确认。</li>
+</ul></li>
+</ul>
+
+    </div>
+
+    
+<footer class="post-footer">
+      
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/2019-08-04/">
+            <span class="next-text nav-default">雪花算法介绍与实现</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+</div>
+
+<div class="copyright">
+
+  
+
+  <a href="http://www.beian.miit.gov.cn" target="_blank">
+    <span class="copyright-year">
+      &copy; 
+      2019
+      <span class="heart">
+        @
+      </span>
+      <span class="author">littlewulu 版权所有 粤ICP备18143782号</span>
+    </span>
+  </a>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

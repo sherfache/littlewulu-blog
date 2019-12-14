@@ -2,76 +2,85 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>帅番茄的编程札记</title>
-    <link>https://littlewulu.cn/</link>
+    <link>http://localhost:1313/</link>
     <description>Recent content on 帅番茄的编程札记</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>littlewulu 版权所有 粤ICP备18143782号</copyright>
-    <lastBuildDate>Sun, 04 Aug 2019 09:01:59 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 14 Dec 2019 00:00:00 +0800</lastBuildDate>
     
-	<atom:link href="https://littlewulu.cn/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>RabbitMQ【一】 AMQP协议</title>
+      <link>http://localhost:1313/post/2019-12-14/</link>
+      <pubDate>Sat, 14 Dec 2019 00:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/2019-12-14/</guid>
+      <description>为什么要用消息队列 总所周知，消息队列最显眼的好处即使&amp;rdquo;削峰填谷&amp;rdquo; —— 管你外部万马奔腾，来到我这里就得一个一个排着来 进</description>
+    </item>
+    
+    <item>
       <title>雪花算法介绍与实现</title>
-      <link>https://littlewulu.cn/post/2019-08-04/</link>
+      <link>http://localhost:1313/post/2019-08-04/</link>
       <pubDate>Sun, 04 Aug 2019 09:01:59 +0800</pubDate>
       
-      <guid>https://littlewulu.cn/post/2019-08-04/</guid>
+      <guid>http://localhost:1313/post/2019-08-04/</guid>
       <description>什么是雪花算法 在分布式场景中，一个常见的场景是需要生成全局唯一的ID，雪花算法(Snowflake)是属于划分命名空间并行生成ID的一种算法</description>
     </item>
     
     <item>
       <title>WSGI协议介绍与Django的wsgi实现介绍</title>
-      <link>https://littlewulu.cn/post/2019-07-26/</link>
+      <link>http://localhost:1313/post/2019-07-26/</link>
       <pubDate>Fri, 26 Jul 2019 14:46:22 +0800</pubDate>
       
-      <guid>https://littlewulu.cn/post/2019-07-26/</guid>
+      <guid>http://localhost:1313/post/2019-07-26/</guid>
       <description>WSGI是啥 Web请求处理从大粒度上看不外乎三步: 接收请求 应用业务逻辑处理 返回响应 在Web服务开发过程中，其实我们最关注的不过是第二步，至于</description>
     </item>
     
     <item>
       <title>Python GIL 全局解释性锁介绍</title>
-      <link>https://littlewulu.cn/post/2019-07-24/</link>
+      <link>http://localhost:1313/post/2019-07-24/</link>
       <pubDate>Wed, 24 Jul 2019 15:53:37 +0800</pubDate>
       
-      <guid>https://littlewulu.cn/post/2019-07-24/</guid>
+      <guid>http://localhost:1313/post/2019-07-24/</guid>
       <description>什么是GIL GIL (Global Interpreter Lock)，全局解释性锁，它上锁的对象是解释器，而Python代码的运行需要解释器进行解释成字节码并提供虚拟机运行，这么大</description>
     </item>
     
     <item>
       <title>TCP 报文结构介绍</title>
-      <link>https://littlewulu.cn/post/2019-07-23/</link>
+      <link>http://localhost:1313/post/2019-07-23/</link>
       <pubDate>Tue, 23 Jul 2019 11:52:15 +0800</pubDate>
       
-      <guid>https://littlewulu.cn/post/2019-07-23/</guid>
+      <guid>http://localhost:1313/post/2019-07-23/</guid>
       <description>TCP传输的字节流报文规定叫Segment(段) TCP报文结构图-旧 TCP报文结构图-新 下面概述各个字段的含义和作用 16位源端口号(Sour</description>
     </item>
     
     <item>
       <title>Go 值接收者 与 指针接收者 的区别</title>
-      <link>https://littlewulu.cn/post/2019-07-22/</link>
+      <link>http://localhost:1313/post/2019-07-22/</link>
       <pubDate>Mon, 22 Jul 2019 09:25:04 +0800</pubDate>
       
-      <guid>https://littlewulu.cn/post/2019-07-22/</guid>
+      <guid>http://localhost:1313/post/2019-07-22/</guid>
       <description>方法与函数 在Go中，同时支持方法和函数，在我的理解中，方法由函数演变而来，将函数的第一个对象参数移动到函数前面，也就是将这个函数赋予到对象或</description>
     </item>
     
     <item>
       <title>About</title>
-      <link>https://littlewulu.cn/about/</link>
+      <link>http://localhost:1313/about/</link>
       <pubDate>Sun, 16 Jun 2019 21:25:09 +0800</pubDate>
       
-      <guid>https://littlewulu.cn/about/</guid>
+      <guid>http://localhost:1313/about/</guid>
       <description>尚未佩妥剑，转眼便天涯。愿历尽千帆，归来仍少年。 关于我 2018年本科毕业于华南理工大学软件学院； 终生学习，以本杰明•富兰克林为精神楷模，韬光</description>
     </item>
     
     <item>
       <title>基于Django实现一个图片服务器（包括图片上传、存储和访问）</title>
-      <link>https://littlewulu.cn/post/2018-10-27/</link>
+      <link>http://localhost:1313/post/2018-10-27/</link>
       <pubDate>Sat, 27 Oct 2018 12:00:00 +0800</pubDate>
       
-      <guid>https://littlewulu.cn/post/2018-10-27/</guid>
+      <guid>http://localhost:1313/post/2018-10-27/</guid>
       <description>背景：自己搭了一个技术博客，少不了图片展示，不想特地买个图片服务器用于图片存储和访问，于是自己实现了一个图片上传和访问的服务。 你需要： 了解P</description>
     </item>
     
