@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>littlewulu 版权所有 粤ICP备18143782号</copyright>
-    <lastBuildDate>Sat, 14 Dec 2019 00:00:00 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 04 Feb 2020 11:49:44 +0800</lastBuildDate>
     
 	<atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>RabbitMQ【二】消息属性概述</title>
+      <link>http://localhost:1313/post/2020-02-04/</link>
+      <pubDate>Tue, 04 Feb 2020 11:49:44 +0800</pubDate>
+      
+      <guid>http://localhost:1313/post/2020-02-04/</guid>
+      <description>消息属性 消息属性是一组预定义的值，包含在消息头帧中，这些值通过Basic.Properties数据结构进行指定； 其中某些属性（例如 deliv</description>
+    </item>
     
     <item>
       <title>RabbitMQ【一】 AMQP协议</title>
