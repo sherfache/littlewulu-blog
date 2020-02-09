@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Serverless了解 - 帅番茄的编程札记</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="帅番茄" /><meta name="description" content="什么是Serverless Serverless 是一种软件系统架构思想和方法，它的核心是用户无须关注支撑应用服务运行的低层主机。 目前市场上比较流行的Server" /><meta name="keywords" content="帅番茄, 编程, 博客, 程序员" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.55.4 with even 4.0.0" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/2020-02-09/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+<meta property="og:title" content="Serverless了解" />
+<meta property="og:description" content="什么是Serverless Serverless 是一种软件系统架构思想和方法，它的核心是用户无须关注支撑应用服务运行的低层主机。 目前市场上比较流行的Server" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/2020-02-09/" />
+<meta property="article:published_time" content="2020-02-09T21:48:49&#43;08:00"/>
+<meta property="article:modified_time" content="2020-02-09T21:48:49&#43;08:00"/>
+
+<meta itemprop="name" content="Serverless了解">
+<meta itemprop="description" content="什么是Serverless Serverless 是一种软件系统架构思想和方法，它的核心是用户无须关注支撑应用服务运行的低层主机。 目前市场上比较流行的Server">
+
+
+<meta itemprop="datePublished" content="2020-02-09T21:48:49&#43;08:00" />
+<meta itemprop="dateModified" content="2020-02-09T21:48:49&#43;08:00" />
+<meta itemprop="wordCount" content="2778">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Serverless了解"/>
+<meta name="twitter:description" content="什么是Serverless Serverless 是一种软件系统架构思想和方法，它的核心是用户无须关注支撑应用服务运行的低层主机。 目前市场上比较流行的Server"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">帅番茄</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">主页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/about">
+        <li class="mobile-menu-item">关于</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">帅番茄</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">主页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about">关于</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Serverless了解</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-02-09 </span>
+        
+        
+      </div>
+    </header>
+
+    
+    <div class="post-content">
+      
+
+<h1 id="什么是serverless">什么是Serverless</h1>
+
+<ul>
+<li><p>Serverless 是<code>一种软件系统架构思想和方法</code>，它的核心是<code>用户无须关注支撑应用服务运行的低层主机</code>。</p></li>
+
+<li><p>目前市场上比较流行的Serverless工具、框架和平台有</p>
+
+<ul>
+<li>AWS Lambda，最早被大众所认可的Serverless实现</li>
+<li>Azure Functions，来自微软公有云的Serverless实现</li>
+<li>OpenWhisk，Apache社区的开源Serverless框架</li>
+<li>Kubeless, 基于Kubernetes架构实现的开源Serverless框架</li>
+<li>Fission，Platform9推出的开源Serverless框架</li>
+<li>OpenFaaS，以容器技术为核心的开源Serverless框架</li>
+<li>Fn，来自Oracle的开源Serverless框架，由原Iron Functions团队开发</li>
+</ul></li>
+
+<li><p>Serverless架构下的应用会被<code>函数化</code>，但不能说Serverless就是<code>Function as a Service (FaaS)</code>。这样的认识并不准确，Serverless涵盖了FaaS的一些特性，可以说FaaS是Serverless架构实现的一个重要手段</p></li>
+</ul>
+
+<p><img src="https://littlewulu.cn/source/images/2002/09_PWe9IdeHWetkZg2HguiPaiiXCRHfdK.jpg" alt="1.jpg" /></p>
+
+<p><img src="https://littlewulu.cn/source/images/2002/09_tnToOvEqkrDMbkojkSip7ebMNMz8iT.jpg" alt="2.jpg" /></p>
+
+<h1 id="与微服务的区别">与微服务的区别</h1>
+
+<ul>
+<li>Serverless和微服务的目的是一致的，那就是提高应用开发、交付上线的效率。但是两者侧重点不同。
+
+<ul>
+<li><code>微服务强调化整为零，提高应用架构灵活度</code></li>
+<li><code>Serverless强调的是&quot;减负&quot;，即将服务器移出用户的管理职责范围，从而降低管理复杂度和成本</code></li>
+</ul></li>
+<li>Serverless架构的实现有一个很重要的前提，那就是需要一个强大的智能云计算平台，无论是公有云还是私有云。
+
+<ul>
+<li>目前而言，并不是每一家企业或者组织都具备这个条件。再者，没有一个架构师完美的，Serverless也有它的限制，不是每一个场景都适合引入Serverless架构</li>
+</ul></li>
+</ul>
+
+<h1 id="serverless-的局限">Serverless 的局限</h1>
+
+<ul>
+<li>和其他很多的技术一样，世界上没有能解决所有问题的万能解决方案和架构理念。Serverless有它的特点和优势，但是同时也有它的局限。有的局限是由其架构特点决定的，有的是目前技术的成熟度决定的，毕竟Serverless还是一个起步时间不长的新型技术领域，在许多方面还需要逐步改善。
+
+<ul>
+<li><code>1 控制力</code>
+
+<ul>
+<li>Serverless的一个突出优点是用户无须关注底层的计算资源，但是这个优点的反面是用户对底层的计算资源没有控制力。</li>
+<li>对于一些希望掌握底层计算资源的应用场景，Serverless并不是一个最合适的选择。</li>
+</ul></li>
+<li><code>2 可移植性</code>
+
+<ul>
+<li>Serverless应用的实现在很大程度上依赖于Serverless平台及该平台上的FaaS和BaaS服务【Backend as a Service，后端即服务，如数据库，消息队列等等】。不同的IT厂商的Serverless平台和解决方案的具体实现并不相同。而且，目前Serverless领域尚没有形成有关的行业标准，这意味着用户将一个平台上的Serverless应用移植到另一个平台时所需要付出的成本会比较高。较低的可移植性将造成厂商锁定(Vendor Lock-in)。这对希望发展Serverless技术，但是又不希望过度依赖特定供应商的企业而言是一个挑战。</li>
+</ul></li>
+<li><code>3 安全性</code>
+
+<ul>
+<li>在Serverless架构下，用户不能直接控制应用实际所运行的主机。不同用户的应用，或者同一用户的不同应用在运行时可能共用底层的主机资源。对于一些安全性要求较高的应用，这将会带来潜在的安全风险。</li>
+</ul></li>
+<li><code>4 性能</code>
+
+<ul>
+<li>当一个Serverless应用长时间空闲时将会被从主机上卸载。当请求再次到达时，平台需要重新加载应用。应用的首次加载以及重新加载的过程将产生一定的延迟。对于一些对延时敏感的应用，需要通过预先加载或延长空闲超时时间等手段进行处理</li>
+</ul></li>
+<li><code>5 执行时长</code>
+
+<ul>
+<li>Serverless的一个重要特点是应用按需加载执行，而不是长时间持续部署在主机上。目前，大部分Serverless平台对FaaS函数的执行时长存在限制。因此Serverless应用更适合一些执行时长比较短的作业。</li>
+</ul></li>
+<li><code>6 技术成熟度</code>
+
+<ul>
+<li>虽然Serverless技术的发展很快，但是毕竟它还是一门起步时间不长的新兴技术。因此，目前Serverless相关平台、工具和框架还处在一个不断变化和演进的阶段，开发和调试的用户体验还需要进一步提升。Serverless相关的文档和资料相对比较少，深入了解Serverless架构的架构师、开发人员和运维人员也相对较少，但是也许这在某种程度上而言是一个机会。</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h1 id="aws-lambda-了解">AWS Lambda 了解</h1>
+
+<ul>
+<li>Amazon Web Service（AWS）是Amazon公司提供的公有云服务。AWS Lambda是AWS的Serverless计算服务。与其他同类平台相比，AWS Lambda的推出时间较早，发展历程较长。</li>
+<li>AWS Lambda是一个事件驱动的函数计算平台、一个Serverless FaaS平台和AWS公有云平台Serverless能力的核心组件。
+
+<ul>
+<li>通过AWS Lambda，用户可以定义函数代码逻辑。</li>
+<li>AWS Lambda 负责在特定事件发生时执行用户的代码逻辑，当同时有多个请求到达时，AWS Lambda负责根据负载实例化若干个用户代码逻辑的实例响应请求。用户不需要关心运行这些代码逻辑的低层计算资源，只需要专心实现业务需求的代码逻辑</li>
+</ul></li>
+<li>AWS Lambda 包含如下几个重要的组件：函数、事件源以及事件
+
+<ul>
+<li><img src="https://littlewulu.cn/source/images/2002/09_0QVoWd2lrac7TKadDelsw2o5rigccc.jpg" alt="3.jpg" /></li>
+<li><code>函数</code>
+
+<ul>
+<li>函数(Function)是AWS Lambda的执行单元，它往往是一段无状态的代码片段。函数定义了用户需要执行的业务逻辑。</li>
+<li>用户可以使用Node.js、Python、Java、C#以及Go等语言编写函数逻辑</li>
+</ul></li>
+<li><code>事件源</code>
+
+<ul>
+<li>事件源(Event Source)是触发AWS Lambda函数执行的触发方。</li>
+<li>事件源可以是AWS上的云服务，也可以是第三方的应用服务。举个栗子，比如用户向S3存储服务上传了一个文件，此时S3将产生一个文件上传的事件。用户可以配置S3使其成为AWS Lambda的事件源，将事件发送给Lambda函数进行处理。</li>
+</ul></li>
+<li><code>事件</code>
+
+<ul>
+<li>事件(Event)描述了触发AWS Lambda函数的原因。事件对象中包含来自事件源的详细信息。</li>
+<li>事件可以作为函数的输入参数，函数根据具体事件的信息进行业务处理。比如，当接收到了S3文件上传事件的通知时，Lambda函数根据文件的类型对文件进行加工处理。</li>
+</ul></li>
+</ul></li>
+<li>由于函数的执行环节是非持久化的，而且函数将会以多个实例的实行来执行。用户无法预知他们的函数究竟会在哪一台具体的主机上被部署和执行。因此，在编写函数的时候要保证函数是<code>无状态</code>的，函数在处理请求时不会依赖于某一台主机上的文件或者信息。当然，有时不可避免地会遇到一些依赖状态的业务场景。这是，函数执行过程中状态的存取可以通过外部的持久化服务解决，一些BaaS，形如AWS上的数据库服务Amazon DynamoDB或者对象存储服务Amazon S3。</li>
+<li>一个完整的Serverless平台除了<code>函数的执行环境</code>之外，还需要提供<code>API网关</code>、<code>安全</code>、<code>日志</code>、<code>监控</code>、<code>开发支持</code>以及与<code>各类服务的集成</code>等各个方面的能力。</li>
+</ul>
+
+<blockquote>
+<p>参考：《深入浅出Serverless: 技术原理与应用实践》</p>
+</blockquote>
+
+    </div>
+
+    
+<footer class="post-footer">
+      
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/2020-02-04/">
+            <span class="next-text nav-default">RabbitMQ【二】消息属性概述</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+</div>
+
+<div class="copyright">
+
+  
+
+  <a href="http://www.beian.miit.gov.cn" target="_blank">
+    <span class="copyright-year">
+      &copy; 
+      2019 - 
+      2020
+      <span class="heart">
+        @
+      </span>
+      <span class="author">littlewulu 版权所有 粤ICP备18143782号</span>
+    </span>
+  </a>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
