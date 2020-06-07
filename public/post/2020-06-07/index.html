@@ -51,7 +51,7 @@
 
 <meta itemprop="datePublished" content="2020-06-07T12:13:00&#43;08:00" />
 <meta itemprop="dateModified" content="2020-06-07T12:13:00&#43;08:00" />
-<meta itemprop="wordCount" content="3524">
+<meta itemprop="wordCount" content="3527">
 
 
 
@@ -141,12 +141,21 @@
 <h1 id="启动并初始化sentinel">启动并初始化Sentinel</h1>
 
 <ul>
-<li>启动命令
-<code>
-redis-sentinel /path/to/your/sentinel.conf
+<li>启动命令<br /></li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></pre></td>
+<td class="lntd">
+<pre class="chroma">$redis-sentinel /path/to/your/sentinel.conf
 or
-redis-server /path/to/your/sentinel.conf --sentinel
-</code></li>
+$redis-server /path/to/your/sentinel.conf --sentinel</pre></td></tr></table>
+</div>
+</div>
+<ul>
 <li>其实Sentinel实例本质上是一个运行在特殊模式下的Redis服务器，只不过Sentinel执行的工作与普通Redis服务器执行的工作不同
 
 <ul>
