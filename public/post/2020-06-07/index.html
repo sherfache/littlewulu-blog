@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Redis-Sentinel高可用方案了解 - 帅番茄的编程札记</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="帅番茄" /><meta name="description" content="什么是Sentinel Sentinel是Redis的高可用解决方案：由一个或多个Sentinel实例组成的Sentinel系统可以监视任意多" /><meta name="keywords" content="帅番茄, 编程, 博客, 程序员" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.55.4 with even 4.0.0" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/2020-06-07/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+
+<meta property="og:title" content="Redis-Sentinel高可用方案了解" />
+<meta property="og:description" content="什么是Sentinel Sentinel是Redis的高可用解决方案：由一个或多个Sentinel实例组成的Sentinel系统可以监视任意多" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/2020-06-07/" />
+<meta property="article:published_time" content="2020-06-07T12:13:00&#43;08:00"/>
+<meta property="article:modified_time" content="2020-06-07T12:13:00&#43;08:00"/>
+
+<meta itemprop="name" content="Redis-Sentinel高可用方案了解">
+<meta itemprop="description" content="什么是Sentinel Sentinel是Redis的高可用解决方案：由一个或多个Sentinel实例组成的Sentinel系统可以监视任意多">
+
+
+<meta itemprop="datePublished" content="2020-06-07T12:13:00&#43;08:00" />
+<meta itemprop="dateModified" content="2020-06-07T12:13:00&#43;08:00" />
+<meta itemprop="wordCount" content="3524">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Redis-Sentinel高可用方案了解"/>
+<meta name="twitter:description" content="什么是Sentinel Sentinel是Redis的高可用解决方案：由一个或多个Sentinel实例组成的Sentinel系统可以监视任意多"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">帅番茄</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">主页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/about">
+        <li class="mobile-menu-item">关于</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">帅番茄</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">主页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about">关于</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Redis-Sentinel高可用方案了解</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-06-07 </span>
+        
+        
+      </div>
+    </header>
+
+    
+    <div class="post-content">
+      
+
+<h1 id="什么是sentinel">什么是Sentinel</h1>
+
+<ul>
+<li><code>Sentinel</code>是<code>Redis</code>的高可用解决方案：由一个或多个<code>Sentinel实例</code>组成的<code>Sentinel系统</code>可以监视任意多个主服务器，以及这些主服务器属下的所有从服务器，并在被监视的主服务器进入下线状态时，自动将下线主服务器属下的某个从服务器升级为新的主服务器【故障转移】，然后由新的主服务器替代已下线的主服务器继续处理命令请求。</li>
+</ul>
+
+<p><img src="https://littlewulu.cn/source/images/2006/07_BPyIPZfUhL8lqd57T1MYpEdsuVFlhg.png" alt="1.png" /></p>
+
+<h1 id="启动并初始化sentinel">启动并初始化Sentinel</h1>
+
+<ul>
+<li>启动命令
+<code>
+redis-sentinel /path/to/your/sentinel.conf
+or
+redis-server /path/to/your/sentinel.conf --sentinel
+</code></li>
+<li>其实Sentinel实例本质上是一个运行在特殊模式下的Redis服务器，只不过Sentinel执行的工作与普通Redis服务器执行的工作不同
+
+<ul>
+<li>例如，普通服务器在初始化的时候会通过载入<code>RDB文件</code>或者<code>AOF文件</code>来还原数据库状态，但Sentinel并不使用数据库，因此Sentinel初始化的时候并不需要载入数据文件</li>
+</ul></li>
+<li>在Sentinel实例中，载入的<code>RedisCommand表</code>与普通Redis服务器也有很大的不同
+
+<ul>
+<li><code>PING</code>、<code>SENTINEL</code>、<code>INFO</code>、<code>SUBSCRIBE</code>、<code>UNSUBSCRIBE</code>、<code>PSUBSCRIBE</code>、<code>PUNSBSCRIBE</code>这七个命令就是客户端可以对Sentinel执行的全部命令了</li>
+<li>这解释了为什么在Sentinel模式下，Redis服务器不能执行诸如<code>SET</code>、<code>DBSIZE</code>、<code>EVAL</code>等命令，因为服务器根本没有在命令表中载入这些命令</li>
+</ul></li>
+<li>我们知道，Redis是C实现的，在Sentinel实例结构体的<code>master字典</code>中，key是服务器名，value是一个<code>sentinelRedisInstance</code>结构体的指针，这个结构体代表一个被Sentinel监视的Redis服务器实例，这个实例可以是主服务器、从服务器、或者另外一个Sentinel —— <code>这意味着，Snetinel实例可以监视另一个Sentinel实例</code></li>
+</ul>
+
+<h3 id="连接向主服务器的网络连接">连接向主服务器的网络连接</h3>
+
+<ul>
+<li>从连接角色上看，Sentinel其实是主服务器的客户端，向主服务器发送命令，并从命令回复中获取相关信息
+
+<ul>
+<li>对于每个被Sentinel监视的主服务器来说，每个Sentinel实例会创建两个连向主服务器的异步网络连接
+
+<ul>
+<li><code>命令连接</code>，专门用于向主服务器发送命令，并接收命令回复</li>
+<li><code>订阅连接</code>，专门用于订阅主服务器的<code>__sentinel__:hello</code>频道</li>
+</ul></li>
+<li>为什么要有两个连接？
+
+<ul>
+<li>书上的解释是，在Redis目前的发布与订阅功能中，被发送的信息都不会保存在Redis服务器里面，为了在让可能不在线或者掉线的客户端(sentinel)不丢失想要监听的消息，就必须创建一个订阅连接来接收该频道的消息</li>
+<li>我的理解的一方面是，连接有主客之分，当客户端想要与服务端通信的时候，通过命令连接发送请求，服务端应答，这很好理解；但是当服务器想要主动跟客户端(Sentinel)通信的时候，实现的手段就是通过订阅/发布功能，服务端发布消息，订阅了的客户端接收到消息，而不是常用的请求/响应的方式；</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h1 id="获取主服务器和从服务器的信息">获取主服务器和从服务器的信息</h1>
+
+<ul>
+<li><p>Sentinel默认会以每十秒一次的频率通过命令连接向被监视的主服务器发送<code>INFO</code>命令</p>
+
+<ul>
+<li><p>通过INFO命令的响应，Sentinel可以获取两方面的信息</p>
+
+<ul>
+<li>一方面是主服务器自身的信息，例如run_id，服务器角色等</li>
+<li>另一个方面是关于主服务器属下所有的从服务器的信息（ip/port等），通过这些信息，Sentinel能够实现<strong>自动发现</strong>从服务器，而不需要用户提供从服务器的地址信息</li>
+</ul>
+
+<p><img src="https://littlewulu.cn/source/images/2006/07_3204PFog3hSQD6LZepNYk7S6n95UD8.png" alt="2.png" /></p></li>
+</ul></li>
+
+<li><p>Sentinel自动发现从服务器之后，同样会创建连接到从服务器的命令连接和订阅连接</p></li>
+</ul>
+
+<h1 id="sentinel之间的互相发现">Sentinel之间的互相发现</h1>
+
+<ul>
+<li>对于每个与Sentinel连接的服务器，Sentinel即通过<code>命令连接</code>向服务器的<code>__sentinel__:hello</code>频道发送消息，又通过<code>订阅连接</code>从服务器的<code>__sentinel__:hello</code>频道接收消息</li>
+</ul>
+
+<p><img src="https://littlewulu.cn/source/images/2006/07_DGksL3AzPvMGlZXJ7vbqAMbVy2lQpg.png" alt="3.png" /></p>
+
+<ul>
+<li><p>对于监视同一个服务器的多个Sentinel来说，一个Sentinel发送的信息会被其他Sentinel接收到，这些信息会被用于更新其他Sentinel对发送信息的Sentinel的认知，也会被用于更新其他Sentinel对被监视服务器<br />
+<img src="https://littlewulu.cn/source/images/2006/07_JksDlwompbsJxBFwQTY0WVi7vmnCPw.png" alt="4.png" /></p>
+
+<ul>
+<li>通过这种方式，Sentinel实例之间也是可以<strong>自动发现</strong>的，不需要用户手动地进行配置</li>
+<li>从这些信息中，可以分析提取两方面的参数
+
+<ul>
+<li>与Sentinel有关的参数：源Sentinel的IP地址、端口号、运行ID和配置纪元(epoch)</li>
+<li>与主服务器有关的参数：源Sentinel正在监视的主服务器的名字、IP地址、端口号和配置纪元<br />
+<img src="https://littlewulu.cn/source/images/2006/07_fvZoQRXRBaMHiLP1QieqG9I3OuL9VW.png" alt="5.png" /></li>
+</ul></li>
+</ul></li>
+
+<li><p>Sentinel实例之间会互相建立命令连接，但是不会建立订阅连接<br />
+<img src="https://littlewulu.cn/source/images/2006/07_oKZwYdLnanYDN4Iob75iQx6mNnIbmb.png" alt="6.png" /></p></li>
+</ul>
+
+<h1 id="故障转移">故障转移</h1>
+
+<ul>
+<li><p><strong>主观下线</strong></p>
+
+<ul>
+<li>默认情况下，Sentinel会以每秒一次的频率向所有与它创建了命令连接的实例(包括主服务器、从服务器、其他Sentinel在内)发送PING命令，并通过实例返回的回复判断实例是否在线
+
+<ul>
+<li>有效回复：+PONG、-LOADING、-MASTERDOWN</li>
+</ul></li>
+<li>如果监听对象没有在<code>down-after-milliseconds</code>配置项所规定的时间内，没有向Sentinel返回过一次有效回复的话，那么Sentinel就会判定这个对象实例进入<code>主观下线状态</code></li>
+</ul></li>
+
+<li><p><strong>客观下线</strong></p>
+
+<ul>
+<li>当Sentinel从其他Sentinel那里接收到足够数量【可配置】的主观下线判断之后，Sentinel就会将主服务器判定为<code>客观下线</code>，并对主服务器执行故障转移操作</li>
+<li>命令：<code>is-master-down-by-addr</code></li>
+<li>请求参数
+
+<ul>
+<li><code>ip</code>: 待评估的主服务器的ip</li>
+<li><code>port</code>: 待评估的主服务器的port</li>
+<li><code>current_epoch</code>: Sentinel当前的配置纪元【它其实是一个计数器，我的理解是用于判定选举的轮次，防止某种原因下，上一轮的选举消息延迟到了当前轮次的选举而影响，有点类似TCP连接中的一些序列号的作用 —— 防止老旧的重置信号影响到新的连接】</li>
+<li><code>run_id</code>: 可以是 * 符号或者Sentinel的运行ID：*符号代表命令仅仅用于检测主服务器的客观下线状态，而Sentinel的运行ID则用于选举领头Sentinel</li>
+</ul></li>
+<li>响应参数
+
+<ul>
+<li><code>down_state</code>: <code>1</code>代表主服务器一下线，<code>0</code>代表主服务器未下线</li>
+<li><code>leader_runid</code>: 可以是<code>*</code>符号或者目标Sentinel的局部领头Sentinel的运行ID: <code>*</code>符号代表命令仅仅用于检测主服务器的下线状态，而局部领头Sentinel的运行ID则用于选举领头Sentinel</li>
+<li><code>leader_epoch</code>: 目标Sentinel的局部领头Sentinel的配置纪元，仅在leader_runid不为*时有效</li>
+</ul></li>
+</ul></li>
+
+<li><p><strong>选举领头Sentinel</strong></p>
+
+<ul>
+<li>当一个主服务器被判定为客观下线之后，监视这个下线主服务器的各个Sentinel会进行协商，选举一个领头Sentinel，并由它对下线主服务器执行故障转移操作</li>
+<li>Sentinel系统选举领头Sentinel的方法是对<code>Raft算法</code>的领头选举方法的，简单来说就是投票半数以上，即可成为领头，规则和方法如下
+
+<ul>
+<li>1. 所有在线的Sentinel都有资格参加且一个算一票</li>
+<li>2. 每次选举，配置纪元epoch都会自增【轮次计数器】</li>
+<li>3. 在一个配置纪元里【轮次】，一个Sentinel一旦设置了局部领头Sentinel，就不能在修改</li>
+<li>4. Sentinel设置局部领头Sentinel的规则是先到先得：最先向目标Sentinel发送设置要求的源Sentinel将成为目标Sentinel的局部领头Sentinel</li>
+<li>5. 获得半数以上票数的Sentinel将成为领头Sentinel，例如10个Sentinel，则需要获取大于等于6票(<sup>10</sup>&frasl;<sub>2</sub> + 1)的票数即可</li>
+<li>6. 在每一轮选举中，最多只会出现一个领头Sentinel</li>
+<li>7. 如果在一定时限内，没有产生领头Sentinel，那么隔一段时间之后再次进行选举</li>
+</ul></li>
+</ul></li>
+
+<li><p><strong>执行故障转移</strong></p>
+
+<ul>
+<li>故障转移有三个步骤
+
+<ul>
+<li>1. 在已下线主服务器属下的所有从服务器中，挑选一个从服务器，并将其转换为主服务器</li>
+<li>2. 让已下线主服务器属下的所有从服务器改为复制新的主服务器</li>
+<li>3. 将已下线主服务器设置为新的主服务器的从服务器，当这个旧的主服务器重新上线时，它就会成为新的主服务器的从服务器</li>
+</ul></li>
+<li>新主服务器的挑选
+
+<ul>
+<li>1. 删除列表中所有处于下线或者断线状态的从服务器，保证列表中剩余的从服务器都是正常在线的</li>
+<li>2. 删除列表中素有最近5秒内【故障转移期间每秒一次INFO】没有有恢复过领头Sentinel的INFO命令的从服务器，保证列表中剩余的从服务器都是最近成功进行通信的</li>
+<li>3. 删除所有与已下线主服务器连接断开超过down-after-milliseconds * 10毫秒的从服务器，保证列表中剩余的从服务器都没有过早地与主服务器断开连接，保证数据比较新</li>
+<li>之后的排序维度：优先级 &gt; 复制偏移量 &gt; run_id
+<img src="https://littlewulu.cn/source/images/2006/07_LUapwQvktDHO1Kf4bNLoFKQdVACmsg.png" alt="7.png" />
+<img src="https://littlewulu.cn/source/images/2006/07_APZfph5VHMHttk3aE9tXh4yGdKfkMc.png" alt="8.png" /></li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h1 id="小结">小结</h1>
+
+<ul>
+<li>通常的高可用方案实现两个方面的内容：<code>冗余+故障转移</code>；redis的高可用方案中，冗余包括了主从服务器复制，sentinel多实例【防止出现单实例】；而故障转移通过Sentinel系统监控来实现。</li>
+</ul>
+
+    </div>
+
+    
+<footer class="post-footer">
+      
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/2020-02-09/">
+            <span class="next-text nav-default">Serverless了解</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+</div>
+
+<div class="copyright">
+
+  
+
+  <a href="http://www.beian.miit.gov.cn" target="_blank">
+    <span class="copyright-year">
+      &copy; 
+      2019 - 
+      2020
+      <span class="heart">
+        @
+      </span>
+      <span class="author">littlewulu 版权所有 粤ICP备18143782号</span>
+    </span>
+  </a>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script src="/lib/highlight/highlight.pack.js?v=20171001"></script><script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
