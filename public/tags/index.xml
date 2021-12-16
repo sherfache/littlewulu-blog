@@ -1,15 +1,11 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on 帅番茄的编程札记</title>
-    <link>http://localhost:1313/tags/</link>
+    <link>https://littlewulu.cn/tags/</link>
     <description>Recent content in Tags on 帅番茄的编程札记</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <copyright>littlewulu 版权所有 粤ICP备18143782号</copyright>
-    
-	<atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <copyright>littlewulu 版权所有 粤ICP备18143782号</copyright><atom:link href="https://littlewulu.cn/tags/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

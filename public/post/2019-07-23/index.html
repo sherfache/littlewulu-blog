@@ -23,10 +23,10 @@
 
 
 
-<meta name="generator" content="Hugo 0.55.4 with even 4.0.0" />
+<meta name="generator" content="Hugo 0.85.0 with even 4.0.0" />
 
 
-<link rel="canonical" href="http://localhost:1313/post/2019-07-23/" />
+<link rel="canonical" href="https://littlewulu.cn/post/2019-07-23/" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -41,22 +41,15 @@
 <meta property="og:title" content="TCP 报文结构介绍" />
 <meta property="og:description" content="TCP传输的字节流报文规定叫Segment(段) TCP报文结构图-旧 TCP报文结构图-新 下面概述各个字段的含义和作用 16位源端口号(Sour" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://localhost:1313/post/2019-07-23/" />
-<meta property="article:published_time" content="2019-07-23T11:52:15&#43;08:00"/>
-<meta property="article:modified_time" content="2019-07-23T11:52:15&#43;08:00"/>
+<meta property="og:url" content="https://littlewulu.cn/post/2019-07-23/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2019-07-23T11:52:15+08:00" />
+<meta property="article:modified_time" content="2019-07-23T11:52:15+08:00" />
 
 <meta itemprop="name" content="TCP 报文结构介绍">
-<meta itemprop="description" content="TCP传输的字节流报文规定叫Segment(段) TCP报文结构图-旧 TCP报文结构图-新 下面概述各个字段的含义和作用 16位源端口号(Sour">
-
-
-<meta itemprop="datePublished" content="2019-07-23T11:52:15&#43;08:00" />
-<meta itemprop="dateModified" content="2019-07-23T11:52:15&#43;08:00" />
-<meta itemprop="wordCount" content="1118">
-
-
-
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="description" content="TCP传输的字节流报文规定叫Segment(段) TCP报文结构图-旧 TCP报文结构图-新 下面概述各个字段的含义和作用 16位源端口号(Sour"><meta itemprop="datePublished" content="2019-07-23T11:52:15+08:00" />
+<meta itemprop="dateModified" content="2019-07-23T11:52:15+08:00" />
+<meta itemprop="wordCount" content="1116">
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="TCP 报文结构介绍"/>
 <meta name="twitter:description" content="TCP传输的字节流报文规定叫Segment(段) TCP报文结构图-旧 TCP报文结构图-新 下面概述各个字段的含义和作用 16位源端口号(Sour"/>
 
@@ -129,50 +122,52 @@
     
     <div class="post-content">
       <ul>
-<li><p>TCP传输的字节流报文规定叫<strong>Segment(段)</strong></p></li>
-
-<li><p>TCP报文结构图-旧<br />
-<img src="https://littlewulu.cn/source/images/1907/23_zgWYeEHpeeAnaiziy8KuPXUgg1dsjP.png" alt="old.png" /></p></li>
-
-<li><p>TCP报文结构图-新<br />
-<img src="https://littlewulu.cn/source/images/1907/23_g2dZUs5XGsnCQs3CJSf1lEJJ9ydOwa.png" alt="new.png" /></p></li>
-
-<li><p><strong>下面概述各个字段的含义和作用</strong></p>
-
+<li>
+<p>TCP传输的字节流报文规定叫<strong>Segment(段)</strong></p>
+</li>
+<li>
+<p>TCP报文结构图-旧<br>
+<img src="https://littlewulu.cn/source/images/1907/23_zgWYeEHpeeAnaiziy8KuPXUgg1dsjP.png" alt="old.png"></p>
+</li>
+<li>
+<p>TCP报文结构图-新<br>
+<img src="https://littlewulu.cn/source/images/1907/23_g2dZUs5XGsnCQs3CJSf1lEJJ9ydOwa.png" alt="new.png"></p>
+</li>
+<li>
+<p><strong>下面概述各个字段的含义和作用</strong></p>
 <ul>
 <li><strong>16位源端口号(Source Port)</strong></li>
 <li><strong>16位目标端口号(Destination Port)</strong></li>
 <li><strong>32位序列号(Sequence Number)</strong>
-
 <ul>
 <li>标志在这个segment中，数据的第一个byte的序列号；在TCP传输流中，每一个字节一个序号；；如果 SYN标志位被激活，则这个序列号会被作为初始序列号，只有数据传输的时候，第一个数据byte的序列号将是初始序列号+1</li>
-</ul></li>
+</ul>
+</li>
 <li><strong>32位确认号(Acknowledgment Number)</strong>
-
 <ul>
 <li>如果 ACK标志位被激活，这个字段指定希望接收的下一个segment的数据字节序列号</li>
-</ul></li>
+</ul>
+</li>
 <li><strong>4位首部长度(Data Offset)</strong>
-
 <ul>
-<li>指明TCP头部的长度，单位是字(4 bytes，32 bits)，因为&rdquo;选项&rdquo;字段是不定长的，因此TCP头部也是不定长的，需要这个字段来指定段数据的起始位置，TCP头部的长度一定是32bits的整数倍</li>
-</ul></li>
+<li>指明TCP头部的长度，单位是字(4 bytes，32 bits)，因为&quot;选项&quot;字段是不定长的，因此TCP头部也是不定长的，需要这个字段来指定段数据的起始位置，TCP头部的长度一定是32bits的整数倍</li>
+</ul>
+</li>
 <li><strong>3位保留位</strong>
-
 <ul>
 <li>必须置零</li>
-</ul></li>
+</ul>
+</li>
 <li><strong>3位ECN （Explicit Congestion Notification 显式拥塞通知）</strong>
-
 <ul>
 <li>ECN允许拥塞控制的端对端通知而避免丢包，它作为一项可选功能，如果底层网络设施支持，则可能被启用ECN的两个端点使用
-
 <ul>
 <li>通常来说，TCP/IP网络通过丢弃数据包来表明信道阻塞，这种方式是被动的，而这个标志位通过主动的方式来通知对端拥塞即将发生</li>
-</ul></li>
-</ul></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><strong>6位控制标志位</strong>
-
 <ul>
 <li>URG (Urgent pointer valid flag)：紧急指针标志位，为1时紧急指针生效，为0时忽略紧急指针</li>
 <li>ACK (Acknowledgment number valid flag)：确认序列号标志位，为1时说明是一个ACK段，为0时忽略确认号字段</li>
@@ -180,35 +175,37 @@
 <li>RST (Reset connection flag)：重置连接标志，用于重置由于主机奔溃或其他原因而出现错误的连接，或者用于拒绝非法的TCP段和拒绝连接请求</li>
 <li>SYN (Synchronize sequence numbers flag)：同步序列号标志，在握手过程中，同步初始序列号</li>
 <li>FIN (End of data flag)：finish标志位，用于释放连接，为1时表示发送方已经没有数据发送了，即关闭奔放数据流</li>
-</ul></li>
+</ul>
+</li>
 <li><strong>16位窗口大小（Window）</strong>
-
 <ul>
 <li>在一个ACK段中，用来告知发送端，接收端希望接收的segment大小，单位是byte；假设 Ack Number 是 1000， window是100，则表明接收端想要接收 序列号是从 1000到1100的数据区间；这个window既可以用来加以指明数据区间，也可以用来控制发送端的发送速率【流量控制】；</li>
-</ul></li>
+</ul>
+</li>
 <li><strong>16位校验和 (checksum)</strong>
-
 <ul>
 <li>奇偶校验，此校验和是对整个的TCP段、包括TCP头部和TCP数据的校验；由发送端计算和存储，并由接收端进行验证</li>
-</ul></li>
+</ul>
+</li>
 <li><strong>16位紧急指针 (Urgent Pointer)</strong>
-
 <ul>
 <li>如果 URG标志位被激活，则这个字段指向紧急数据的最后一个字节的序列号</li>
-</ul></li>
+</ul>
+</li>
 <li><strong>选项 (options)</strong>
-
 <ul>
 <li>0 到 40bytes</li>
-</ul></li>
-</ul></li>
-
-<li><p>参考：</p>
-
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>参考：</p>
 <ul>
 <li><a href="http://www.networksorcery.com/enp/protocol/tcp.htm">http://www.networksorcery.com/enp/protocol/tcp.htm</a></li>
 <li><a href="https://zh.wikipedia.org/wiki/%E6%98%BE%E5%BC%8F%E6%8B%A5%E5%A1%9E%E9%80%9A%E7%9F%A5">https://zh.wikipedia.org/wiki/%E6%98%BE%E5%BC%8F%E6%8B%A5%E5%A1%9E%E9%80%9A%E7%9F%A5</a></li>
-</ul></li>
+</ul>
+</li>
 </ul>
 
     </div>
@@ -248,11 +245,11 @@
 
   
 
-  <a href="http://www.beian.miit.gov.cn" target="_blank">
+  <a href="https://beian.miit.gov.cn" target="_blank">
     <span class="copyright-year">
       &copy; 
       2019 - 
-      2020
+      2021
       <span class="heart">
         @
       </span>

@@ -23,10 +23,10 @@
 
 
 
-<meta name="generator" content="Hugo 0.55.4 with even 4.0.0" />
+<meta name="generator" content="Hugo 0.85.0 with even 4.0.0" />
 
 
-<link rel="canonical" href="http://localhost:1313/post/2019-07-22/" />
+<link rel="canonical" href="https://littlewulu.cn/post/2019-07-22/" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -41,22 +41,15 @@
 <meta property="og:title" content="Go 值接收者 与 指针接收者 的区别" />
 <meta property="og:description" content="方法与函数 在Go中，同时支持方法和函数，在我的理解中，方法由函数演变而来，将函数的第一个对象参数移动到函数前面，也就是将这个函数赋予到对象或" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://localhost:1313/post/2019-07-22/" />
-<meta property="article:published_time" content="2019-07-22T09:25:04&#43;08:00"/>
-<meta property="article:modified_time" content="2019-07-22T09:25:04&#43;08:00"/>
+<meta property="og:url" content="https://littlewulu.cn/post/2019-07-22/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2019-07-22T09:25:04+08:00" />
+<meta property="article:modified_time" content="2019-07-22T09:25:04+08:00" />
 
 <meta itemprop="name" content="Go 值接收者 与 指针接收者 的区别">
-<meta itemprop="description" content="方法与函数 在Go中，同时支持方法和函数，在我的理解中，方法由函数演变而来，将函数的第一个对象参数移动到函数前面，也就是将这个函数赋予到对象或">
-
-
-<meta itemprop="datePublished" content="2019-07-22T09:25:04&#43;08:00" />
-<meta itemprop="dateModified" content="2019-07-22T09:25:04&#43;08:00" />
-<meta itemprop="wordCount" content="1733">
-
-
-
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="description" content="方法与函数 在Go中，同时支持方法和函数，在我的理解中，方法由函数演变而来，将函数的第一个对象参数移动到函数前面，也就是将这个函数赋予到对象或"><meta itemprop="datePublished" content="2019-07-22T09:25:04+08:00" />
+<meta itemprop="dateModified" content="2019-07-22T09:25:04+08:00" />
+<meta itemprop="wordCount" content="1735">
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Go 值接收者 与 指针接收者 的区别"/>
 <meta name="twitter:description" content="方法与函数 在Go中，同时支持方法和函数，在我的理解中，方法由函数演变而来，将函数的第一个对象参数移动到函数前面，也就是将这个函数赋予到对象或"/>
 
@@ -128,18 +121,14 @@
 
     
     <div class="post-content">
-      
-
-<h2 id="方法与函数"><strong>方法与函数</strong></h2>
-
+      <h2 id="方法与函数"><strong>方法与函数</strong></h2>
 <ul>
 <li>在Go中，同时支持方法和函数，在我的理解中，方法由函数演变而来，将函数的第一个对象参数移动到函数前面，也就是将这个函数赋予到对象或者类的命名空间下，就变成了方法，因此方法是针对对象或者类而言的。
-比如下面这个例子
-<br /></li>
+比如下面这个例子</li>
 </ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -152,9 +141,11 @@
 </span><span class="lnt">11
 </span><span class="lnt">12
 </span><span class="lnt">13
-</span></pre></td>
+</span><span class="lnt">14
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">type foo struct {
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">
+type foo struct {
 	Name string
 }
 
@@ -166,17 +157,16 @@ func (f *foo)Who1()string{
 // 函数
 func Who2(f *foo)string{
 	return f.Name
-}</pre></td></tr></table>
+}
+</code></pre></td></tr></table>
 </div>
-</div>
-<h2 id="接收者"><strong>接收者</strong></h2>
-
+</div><h2 id="接收者"><strong>接收者</strong></h2>
 <ul>
 <li>接收者(receiver)指方法名之前指定的那个类型，分为 值接收者(value receiver) 和 指针接收者(pointer receiver)。先来看一下示例：</li>
 </ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -197,9 +187,9 @@ func Who2(f *foo)string{
 </span><span class="lnt">19
 </span><span class="lnt">20
 </span><span class="lnt">21
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">type foo struct {
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">type foo struct {
 	Count int
 }
 
@@ -219,22 +209,20 @@ func main(){
 	fmt.Println(f.Count)  // 2 - 改变了实例内部变量的值
 	fmt.Println(f.Inc2())  // 3
 	fmt.Println(f.Count)  // 2 - 没有改变实例内部变量的值
-}</pre></td></tr></table>
+}
+</code></pre></td></tr></table>
 </div>
-</div>
-<ul>
+</div><ul>
 <li>从上述示例我们可以看出以下两点</li>
 </ul>
-
 <ol>
 <li>值接收者无法更改接收者实例的内部变量的值，这意味着声明为值接收者在方法调用的时候传递的是对象的副本；</li>
 <li>指针接收者能够修改接收者实例的内部变量的值，这意味着声明为指针接收者在方法调用的时候传递的是对象的指针；</li>
 </ol>
-
 <p><strong>进一步</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -261,9 +249,10 @@ func main(){
 </span><span class="lnt">25
 </span><span class="lnt">26
 </span><span class="lnt">27
-</span></pre></td>
+</span><span class="lnt">28
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">type foo struct {
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">type foo struct {
 	Count int
 }
 
@@ -289,29 +278,27 @@ func main(){
 	fmt.Println(f1.Count)  // 2 - 改变
 	f1.Inc2()
 	fmt.Println(f1.Count)  // 2 - 没变
-}</pre></td></tr></table>
+}
+
+</code></pre></td></tr></table>
 </div>
-</div>
-<ul>
+</div><ul>
 <li>可以看出，不管是实例值还是实例指针，调用方法时，传递的是指针还是副本，取决于方法声明的时候的接收者类型 —— 接收者类型是指针则传指针，接收者类型是值则传副本。同时，go编译器在方法调用上做了自动检测，如 f2实例指针在调用Inc2()方法时，编译器会自动做<strong>解引用操作</strong>；同样 f1实例值在调用Inc1()方法时，编译器会自动做<strong>取址操作</strong>。</li>
 </ul>
-
 <h2 id="方法集"><strong>方法集</strong></h2>
-
 <ul>
 <li>Go的接口类型让我们能够很好地实现泛型，通过接口类型实现了对鸭子类型的支持，使得静态编译带来的安全和动态语言的灵活在Go中得到一定程度的鱼与熊掌兼得。</li>
 </ul>
-
 <blockquote>
 <p>所谓鸭子类型说的是，只要走起路来像鸭子，叫起来也像鸭子，那么就可以把它当做鸭子。</p>
-
+</blockquote>
+<blockquote>
 <p>总所周知，Linux中一切皆文件，那么简单来说，只要一个对象实现了 read() 方法和 write() 方法，那么我们就可以把这个对象当做一个文件来操作。</p>
 </blockquote>
-
 <p>先来看个示例</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt"> 1
+<pre class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
 </span><span class="lnt"> 3
 </span><span class="lnt"> 4
@@ -331,9 +318,9 @@ func main(){
 </span><span class="lnt">18
 </span><span class="lnt">19
 </span><span class="lnt">20
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">type Stringer interface {
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">type Stringer interface {
 	ToString() string
 }
 
@@ -352,73 +339,72 @@ func SayHello(s Stringer){
 func main(){
 	f := foo{Name:&#34;Im 帅番茄&#34;}
 	SayHello(f)
-}</pre></td></tr></table>
+}
+</code></pre></td></tr></table>
 </div>
-</div>
-<ul>
+</div><ul>
 <li>我们声明了Stringer接口，该接口只含有ToString()一个方法，SayHello()函数接收一个Stringer接口类型的参数，我们的结构体foo实现了该接口，现在运行这段程序，却编译不通过</li>
 </ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"># command-line-arguments
+<pre class="chroma"><code class="language-fallback" data-lang="fallback"># command-line-arguments
 main/main.go:25:10: cannot use f (type foo) as type Stringer in argument to SayHello:
-	foo does not implement Stringer (ToString method has pointer receiver)</pre></td></tr></table>
+	foo does not implement Stringer (ToString method has pointer receiver)
+</code></pre></td></tr></table>
 </div>
-</div>
-<ul>
+</div><ul>
 <li>为什么编译器不考虑我们的值是实现该接口的类型呢？下面是语言规范里定义的接口调用规则，用于说明是否我们一个类型的值或指针实现了该接口</li>
 </ul>
-
 <blockquote>
+</blockquote>
 <ol>
 <li>类型 *T 的可调用方法集包含接收者为 *T 或 T 的所有方法集</li>
 <li>类型 T 的可调用方法集包含接收者为 T 的所有方法</li>
 <li>以上两条意味着，类型 T 的可调用方法集不包含接收者为 *T 的方法</li>
 </ol>
-</blockquote>
-
 <ul>
 <li>以上的示例明显不符合第三条规则，我们只需将传值改为传指针即可</li>
 </ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><span class="lnt">1
+<pre class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
 </span><span class="lnt">4
-</span></pre></td>
+</span></code></pre></td>
 <td class="lntd">
-<pre class="chroma">func main(){
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">func main(){
 	f := foo{Name:&#34;Im 帅番茄&#34;}
 	SayHello(&amp;f)
-}</pre></td></tr></table>
+}
+</code></pre></td></tr></table>
 </div>
-</div>
-<ul>
+</div><ul>
 <li>至于为什么在接口中<strong>值类型</strong>无法调用声明为<strong>指针接收者</strong>的方法，原因在于具体值存储于接口类型中时是无法取址的（The concrete value stored in an interface is not addressable.），这一点如同我们是无法直接对map中的元素直接取址的，因为map的底层实现是类似hash table，当我们对map中的具体元素进行取址后，随着hash table的增长，map的元素会进行迁移，这可能会导致取址行为的失效，因此编译器直接禁止了对map具体元素的取址。</li>
 <li>关于为什么存储于接口类型中的具体值是不支持取址的，我找一个比较透彻的例子辅助理解：</li>
 </ul>
-
-<p><img src="https://littlewulu.cn/source/images/1907/24_ppH7ALSDqcNzy2LcNWayt6CtUQvmEj.png" alt="not addressable" /></p>
-
+<p><img src="https://littlewulu.cn/source/images/1907/24_ppH7ALSDqcNzy2LcNWayt6CtUQvmEj.png" alt="not addressable"></p>
 <ul>
-<li>在将一个值赋予一个接口类型的时候，编译器需要确保该值实现了该接口声明的方法集，而类型foo只声明了指针接收者，在值f传递给接口类型Stringer的时候，值f是无法寻址的，因此无法通过编译；但是指针&amp;f直接传递了地址，编译器能够正确找到对应方法，因此能够通过编译。</li>
-
-<li><p>但反过来，<strong>值接收者方法</strong>却能够被<strong>指针类型</strong>正确调用是因为指针类型能够被正确得解引用（Value-receiver methods can be called with pointer values because they can be dereferenced first）。</p></li>
-
-<li><p>参考资料</p>
-
+<li>
+<p>在将一个值赋予一个接口类型的时候，编译器需要确保该值实现了该接口声明的方法集，而类型foo只声明了指针接收者，在值f传递给接口类型Stringer的时候，值f是无法寻址的，因此无法通过编译；但是指针&amp;f直接传递了地址，编译器能够正确找到对应方法，因此能够通过编译。</p>
+</li>
+<li>
+<p>但反过来，<strong>值接收者方法</strong>却能够被<strong>指针类型</strong>正确调用是因为指针类型能够被正确得解引用（Value-receiver methods can be called with pointer values because they can be dereferenced first）。</p>
+</li>
+<li>
+<p>参考资料</p>
 <ul>
 <li><a href="https://books.studygolang.com/advanced-go-programming-book/ch1-basic/ch1-04-func-method-interface.html">https://books.studygolang.com/advanced-go-programming-book/ch1-basic/ch1-04-func-method-interface.html</a></li>
 <li><a href="https://studygolang.com/articles/1113">https://studygolang.com/articles/1113</a></li>
 <li><a href="https://github.com/golang/go/wiki/MethodSets#interfaces">https://github.com/golang/go/wiki/MethodSets#interfaces</a></li>
 <li><a href="https://stackoverflow.com/questions/48790663/why-value-stored-in-an-interface-is-not-addressable-in-golang">https://stackoverflow.com/questions/48790663/why-value-stored-in-an-interface-is-not-addressable-in-golang</a></li>
-</ul></li>
+</ul>
+</li>
 </ul>
 
     </div>
@@ -458,11 +444,11 @@ main/main.go:25:10: cannot use f (type foo) as type Stringer in argument to SayH
 
   
 
-  <a href="http://www.beian.miit.gov.cn" target="_blank">
+  <a href="https://beian.miit.gov.cn" target="_blank">
     <span class="copyright-year">
       &copy; 
       2019 - 
-      2020
+      2021
       <span class="heart">
         @
       </span>

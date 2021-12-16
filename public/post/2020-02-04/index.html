@@ -23,10 +23,10 @@
 
 
 
-<meta name="generator" content="Hugo 0.55.4 with even 4.0.0" />
+<meta name="generator" content="Hugo 0.85.0 with even 4.0.0" />
 
 
-<link rel="canonical" href="http://localhost:1313/post/2020-02-04/" />
+<link rel="canonical" href="https://littlewulu.cn/post/2020-02-04/" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -41,22 +41,15 @@
 <meta property="og:title" content="RabbitMQ【二】消息属性概述" />
 <meta property="og:description" content="消息属性 消息属性是一组预定义的值，包含在消息头帧中，这些值通过Basic.Properties数据结构进行指定； 其中某些属性（例如 deliv" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://localhost:1313/post/2020-02-04/" />
-<meta property="article:published_time" content="2020-02-04T11:49:44&#43;08:00"/>
-<meta property="article:modified_time" content="2020-02-04T11:49:44&#43;08:00"/>
+<meta property="og:url" content="https://littlewulu.cn/post/2020-02-04/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2020-02-04T11:49:44+08:00" />
+<meta property="article:modified_time" content="2020-02-04T11:49:44+08:00" />
 
 <meta itemprop="name" content="RabbitMQ【二】消息属性概述">
-<meta itemprop="description" content="消息属性 消息属性是一组预定义的值，包含在消息头帧中，这些值通过Basic.Properties数据结构进行指定； 其中某些属性（例如 deliv">
-
-
-<meta itemprop="datePublished" content="2020-02-04T11:49:44&#43;08:00" />
-<meta itemprop="dateModified" content="2020-02-04T11:49:44&#43;08:00" />
+<meta itemprop="description" content="消息属性 消息属性是一组预定义的值，包含在消息头帧中，这些值通过Basic.Properties数据结构进行指定； 其中某些属性（例如 deliv"><meta itemprop="datePublished" content="2020-02-04T11:49:44+08:00" />
+<meta itemprop="dateModified" content="2020-02-04T11:49:44+08:00" />
 <meta itemprop="wordCount" content="1720">
-
-
-
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="RabbitMQ【二】消息属性概述"/>
 <meta name="twitter:description" content="消息属性 消息属性是一组预定义的值，包含在消息头帧中，这些值通过Basic.Properties数据结构进行指定； 其中某些属性（例如 deliv"/>
 
@@ -128,147 +121,141 @@
 
     
     <div class="post-content">
-      
-
-<h1 id="消息属性">消息属性</h1>
-
+      <h1 id="消息属性">消息属性</h1>
 <ul>
-<li><p>消息属性是一组预定义的值，包含在<code>消息头帧</code>中，这些值通过<code>Basic.Properties</code>数据结构进行指定；</p>
-
+<li>
+<p>消息属性是一组预定义的值，包含在<code>消息头帧</code>中，这些值通过<code>Basic.Properties</code>数据结构进行指定；</p>
 <ul>
 <li>其中某些属性（例如 delivery-mode）在AMQP协议中有明确的含义，有些属性（例如 type）则没有明确的规范；</li>
-</ul></li>
-
-<li><p>先来个图</p>
-
-<ul>
-<li><img src="https://littlewulu.cn/source/images/2002/04_QqX8mvJIQYbdI12Um0h6nyzfKr7rUG.jpg" alt="1-1.jpg" /></li>
-</ul></li>
 </ul>
-
+</li>
+<li>
+<p>先来个图</p>
+<ul>
+<li><img src="https://littlewulu.cn/source/images/2002/04_QqX8mvJIQYbdI12Um0h6nyzfKr7rUG.jpg" alt="1-1.jpg"></li>
+</ul>
+</li>
+</ul>
 <h1 id="消息属性概述">消息属性概述</h1>
-
 <ul>
 <li>在消息标准化的发展过程中，AMQP消息属性为定义和传输消息元数据提供了一个有用的起点</li>
 <li><code>content-type</code> : 让消费者知道如何解释消息体
-
 <ul>
 <li>当消息的有效载荷格式无法自描述时，你的应用程序会倾向使用一种隐式契约，这种隐式契约天生容易出错</li>
 <li>显式指定content-type是明智的，如使用 application/json，这让消费者可以明确地知道如何反序列化消息体</li>
-</ul></li>
+</ul>
+</li>
 <li><code>content-encoding</code> : 指示消息体使用某种特殊的方式进行压缩或编码
-
 <ul>
 <li><code>默认情况下</code>，通过AMQP发送的消息并不会被压缩</li>
 <li>它是一个修饰符，通常用于表明消息体的内容已经使用gzip或者其他形式的压缩方式进行了压缩</li>
 <li>形如在电子邮件中，最常见的编码类型是<code>Base64</code>和<code>QuotedPrintable</code>。<code>Base64</code>编码用于确保消息中传输的二进制数据不违反纯文本的<code>SMTP</code>协议 【如传图片时，需要将其转为Base64编码】
-
 <ul>
 <li><code>AMQP是一种二进制协议，这意味着消息体中的内容以原生的状态传输，不在消息编组和解组的过程中进行编码和转换</code></li>
-</ul></li>
-</ul></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><code>message-id</code> 和 <code>correlation-id</code> 来唯一标识消息和消息响应，用于实现消息跟踪
-
 <ul>
 <li>这两个是<code>应用级别</code>的属性，并没有提供正式的行为定义
-
 <ul>
 <li>允许255个字节的UTF-8编码数据，并以未压缩的方式存储在<code>Basic.Properties</code>数据结构中</li>
 <li><code>correlation-id</code> 用于指定该消息是对另一个消息的响应，通过携带关联消息的<code>message-id</code>可以做到这一点
-
 <ul>
 <li>另一种选择是使用它来传递关联消息的事务ID或者其他类似数据</li>
-</ul></li>
-</ul></li>
-</ul></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 <li><code>timestamp</code> : 描述消息创建时间
-
 <ul>
 <li>时间戳，一般是一个Unix纪元时间【整数值】</li>
 <li><code>值得注意的是，时间戳没有时区上下文，因此建议在所有消息中使用UTC或其他统一的时区</code>
-
 <ul>
 <li>当你的消息跨越多个时区到达地理位置分散的RabbitMQ代理服务器时，通过预先对时区进行标准化可以解决可能由此产生的后续问题</li>
-</ul></li>
-</ul></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><code>expiration</code> : 表明消息过期时间戳
-
 <ul>
 <li>如果指定了该值，那么RabbitMQ将丢弃当前时间大于该值的消息</li>
 <li>一般是一个Unix纪元时间戳或整数时间戳</li>
 <li>RabbitMQ还有可以让消息过期的其他功能，如队列的参数：<code>x-message-ttl</code></li>
-</ul></li>
+</ul>
+</li>
 <li><code>delivery-mode</code> : 将消息写入磁盘或内存队列
-
 <ul>
 <li>一个字节字段，向消息代理服务器表明在将消息投递给任何正在等待的消费者之前，先将它持久化到磁盘上
-
 <ul>
 <li>持久化意味着，即使RabbitMQ服务器重新启动了，消息也会保留到队列中直到被消费</li>
-</ul></li>
+</ul>
+</li>
 <li><code>1</code>: 非持久化消息；<code>2</code>: 持久化消息</li>
 <li><code>这个字段的范畴是消息，意味着一个队列可能包含持久化和非持久化的消息</code></li>
-</ul></li>
+</ul>
+</li>
 <li><code>app-id</code> 和 <code>user-id</code> 帮助追踪出现问题的消息发布者应用程序
-
 <ul>
 <li>它们可以用于标识消息源</li>
 <li><code>app-id</code>
-
 <ul>
 <li>短字符串，最多允许 255个 UTF-8字符</li>
 <li>如果你的应用程序采用的是带版本的API为中心的设计，那么在生成消息时可以使用<code>app-id</code>传递特定API和版本号</li>
 <li>另一个用途是收集统计信息
-
 <ul>
 <li>如果你使用消息来传递登录事件，则可以将app-id属性设置为触发登录事件的平台和应用程序版本</li>
-</ul></li>
-</ul></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><code>user-id</code>
-
 <ul>
 <li>在用户身份验证的应用场景中，使用<code>user-id</code>属性来标识已登录的用户非常常见</li>
-</ul></li>
-</ul></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><code>type</code> : 定义发布者和消费者之间的契约
-
 <ul>
 <li>一个自由格式字符串值，通过type属性，你的应用程序可以使用它来确定如何处理一个消息 - 描述消息中的内容</li>
-<li><img src="https://littlewulu.cn/source/images/2002/04_TqtKA4jJeW1yfnJhsW8L1tAxmnrZFy.jpg" alt="2-2.jpg" /></li>
+<li><img src="https://littlewulu.cn/source/images/2002/04_TqtKA4jJeW1yfnJhsW8L1tAxmnrZFy.jpg" alt="2-2.jpg"></li>
 <li>另外例如<code>ETL</code>(extract-transform-load 提取-转换-加载)过程中，用type来区别一个通用队列中的不同类型的消息</li>
-</ul></li>
+</ul>
+</li>
 <li><code>reply-to</code> ： 实现响应消息的路由
-
 <ul>
 <li><code>reply-to</code> 属性可以用来携带消费者在回复消息时应该使用的路由键，从而实现RPC模式</li>
-</ul></li>
+</ul>
+</li>
 <li><code>headers</code> : 映射表，定义自由格式的属性和实现RabbitMQ路由
-
 <ul>
 <li>一个key-value表，允许用户自定义任意的键和值
-
 <ul>
 <li>键可以是ASCII或Unicode字符串，最大长度255个字符，值可以是任何有效的AMQP值类型</li>
-</ul></li>
+</ul>
+</li>
 <li>另一个功能是，RabbitMQ可以根据headers表中填充的值路由消息，而不需要依赖路由键 【当交换器类型是<code>Headers</code>类型时】</li>
-</ul></li>
+</ul>
+</li>
 <li><code>priority</code> : 建议避免使用
-
 <ul>
 <li>用于指定队列中的消息优先级，值范围是 <code>[0,9]</code>
-
 <ul>
 <li>值越小，优先级越大</li>
-</ul></li>
+</ul>
+</li>
 <li>AMQP定义明确，RabbitMQ在<code>3.5.0</code>版本后支持</li>
-</ul></li>
+</ul>
+</li>
 <li><code>cluster-id</code> : 已弃用</li>
 </ul>
-
 <h1 id="小结">小结</h1>
-
 <ul>
-<li><img src="https://littlewulu.cn/source/images/2002/04_F2Yz5eI6bjJfkUembPwBFGG15YjY3s.jpg" alt="3-3.jpg" /></li>
+<li><img src="https://littlewulu.cn/source/images/2002/04_F2Yz5eI6bjJfkUembPwBFGG15YjY3s.jpg" alt="3-3.jpg"></li>
 </ul>
 
     </div>
@@ -308,11 +295,11 @@
 
   
 
-  <a href="http://www.beian.miit.gov.cn" target="_blank">
+  <a href="https://beian.miit.gov.cn" target="_blank">
     <span class="copyright-year">
       &copy; 
       2019 - 
-      2020
+      2021
       <span class="heart">
         @
       </span>
